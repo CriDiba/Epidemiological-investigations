@@ -13,6 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 
 public class AdminInterfaceController implements Initializable {
     @FXML
@@ -38,6 +39,8 @@ public class AdminInterfaceController implements Initializable {
     private TextField textPassword;
     @FXML
     private ComboBox<Ruolo> comboRuolo;
+    
+    private int index = -1;
 
     /**
      * initialize is the first method to be invoked
@@ -93,10 +96,29 @@ public class AdminInterfaceController implements Initializable {
 			selectedItems.forEach(allItems::remove);
 	}
 	
+	
+	public void handleEditUser() {
+		/*
+		 * update in the database
+		 */
+	}
+	
+	public void getSelected(MouseEvent event) {
+		index = tableView.getSelectionModel().getSelectedIndex();
+		if(index <= -1)
+			return;
+		
+		textNome.setText(colNome.getCellData(index));
+		textCognome.setText(colCognome.getCellData(index));
+		textUsername.setText(colUsername.getCellData(index));
+		textPassword.setText(colPassword.getCellData(index));
+		comboRuolo.setValue(colRuolo.getCellData(index));
+	}
+	
 	/**
 	 * clears textfields
 	 */
-	private void clearTextFields() {
+	public void clearTextFields() {
 		textNome.clear();
     	textCognome.clear();
     	textUsername.clear();

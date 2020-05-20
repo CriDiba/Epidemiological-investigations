@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
@@ -16,10 +17,10 @@
    <children>
       <AnchorPane prefHeight="42.0" prefWidth="700.0">
          <children>
-            <Button layoutX="627.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleDeleteSelected" text="Delete" />
+            <Button layoutX="627.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleDeleteSelected" text="Delete" AnchorPane.rightAnchor="22.6" />
          </children>
       </AnchorPane>
-      <TableView fx:id="tableView" prefHeight="314.0" prefWidth="700.0">
+      <TableView fx:id="tableView" onMouseClicked="#getSelected" prefHeight="314.0" prefWidth="700.0">
         <columns>
           <TableColumn fx:id="colNome" prefWidth="140.0" text="Nome" />
           <TableColumn fx:id="colCognome" prefWidth="140.0" text="Cognome" />
@@ -30,6 +31,9 @@
          <VBox.margin>
             <Insets bottom="20.0" />
          </VBox.margin>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
       </TableView>
       <GridPane alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="100.0" prefWidth="400.0" VBox.vgrow="NEVER">
         <columnConstraints>
@@ -50,8 +54,29 @@
                   <Insets />
                </opaqueInsets>
             </TextField>
-            <Button mnemonicParsing="false" onAction="#handleAddUser" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <ComboBox fx:id="comboRuolo" prefHeight="26.0" prefWidth="174.0" promptText="Ruolo" GridPane.rowIndex="2" />
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#handleAddUser" text="Add">
+                     <HBox.margin>
+                        <Insets top="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#handleEditUser" text="Edit">
+                     <HBox.margin>
+                        <Insets top="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#clearTextFields" text="Clear">
+                     <HBox.margin>
+                        <Insets top="4.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets right="4.0" />
+               </padding>
+            </HBox>
          </children>
          <padding>
             <Insets left="10.0" />
