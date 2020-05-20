@@ -1,8 +1,8 @@
-package epidemic.controller;
+package epidemic.model;
 
 public enum Ruolo {
 	ADMIN,
 	ANALISTA,
 	AUTORIZZATO,
-	CONTRATTO;
+	CONTRATTO
 }

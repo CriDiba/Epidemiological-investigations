@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
@@ -10,24 +15,24 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="epidemic.controller.LoginController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="epidemic.controller.LoginController">
    <children>
       <AnchorPane prefHeight="286.0" prefWidth="500.0">
          <children>
-            <Text layoutX="112.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, please log in!" textAlignment="CENTER" wrappingWidth="276.53668785095215" AnchorPane.bottomAnchor="220.11874999999998" AnchorPane.leftAnchor="112.0" AnchorPane.rightAnchor="111.46331214904785" AnchorPane.topAnchor="34.60546875">
+            <Text layoutX="79.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, please log in!" textAlignment="CENTER" wrappingWidth="342.53668785095215" AnchorPane.bottomAnchor="247.8681640625" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="78.46331214904785" AnchorPane.topAnchor="37.8662109375">
                <font>
                   <Font name="Calibri" size="26.0" />
                </font>
             </Text>
-            <TextField layoutX="166.0" layoutY="116.0" prefHeight="26.0" prefWidth="204.0" promptText="Username" AnchorPane.bottomAnchor="144.0" AnchorPane.leftAnchor="166.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="116.0" />
-            <PasswordField fx:id="pwd" layoutX="166.0" layoutY="157.0" prefHeight="26.0" prefWidth="204.0" promptText="Password" AnchorPane.bottomAnchor="103.0" AnchorPane.leftAnchor="166.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="157.0" />
-            <Button layoutX="224.0" layoutY="212.0" mnemonicParsing="false" onAction="#handleLogin" text="Login" AnchorPane.bottomAnchor="48.799999999999976" AnchorPane.leftAnchor="224.0" AnchorPane.rightAnchor="230.4" AnchorPane.topAnchor="212.0" />
+            <TextField fx:id="username" layoutX="166.0" layoutY="116.0" prefHeight="32.0" prefWidth="204.0" promptText="Username" AnchorPane.bottomAnchor="168.0" AnchorPane.leftAnchor="166.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="116.0" />
+            <PasswordField fx:id="password" layoutX="166.0" layoutY="157.0" prefHeight="32.0" prefWidth="204.0" promptText="Password" AnchorPane.bottomAnchor="127.0" AnchorPane.leftAnchor="166.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="157.0" />
+            <Button layoutX="170.0" layoutY="212.0" mnemonicParsing="false" onAction="#handleLogin" prefHeight="32.0" prefWidth="198.0" text="Login" AnchorPane.bottomAnchor="72.0" AnchorPane.leftAnchor="170.0" AnchorPane.rightAnchor="132.0" AnchorPane.topAnchor="212.0" />
             <ImageView fitHeight="32.0" fitWidth="26.0" layoutX="128.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="144.39999999999998" AnchorPane.leftAnchor="128.0" AnchorPane.rightAnchor="346.0" AnchorPane.topAnchor="116.0">
                <image>
                   <Image url="@/icons/user_icon.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="26.0" fitWidth="32.0" layoutX="128.0" layoutY="157.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="103.39999999999998" AnchorPane.leftAnchor="128.0" AnchorPane.rightAnchor="346.0" AnchorPane.topAnchor="157.0">
+            <ImageView fitHeight="32.0" fitWidth="26.0" layoutX="128.0" layoutY="157.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="127.0" AnchorPane.leftAnchor="128.0" AnchorPane.rightAnchor="346.0" AnchorPane.topAnchor="157.0">
                <image>
                   <Image url="@/icons/passwd_icon.png" />
                </image>

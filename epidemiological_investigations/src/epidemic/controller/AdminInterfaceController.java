@@ -1,8 +1,17 @@
 package epidemic.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import epidemic.model.*;
+import epidemic.model.DAO.DAO;
+import epidemic.model.DAO.MySqlDAOFactory;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -41,6 +50,8 @@ public class AdminInterfaceController implements Initializable {
     private ComboBox<Ruolo> comboRuolo;
     
     private int index = -1;
+    
+    private MySqlDAOFactory database;
 
     /**
      * initialize is the first method to be invoked
@@ -48,25 +59,60 @@ public class AdminInterfaceController implements Initializable {
      * the combobox
      */
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
+	public void initialize(URL url, ResourceBundle rb) {
 		initTableCols();
     	comboRuolo.getItems().addAll(Ruolo.values());
+    	
+    	//Visualizzo le entry del DB
+    	database = new MySqlDAOFactory();
+    	DAO<Utente> utenteDAO = database.getUtenteDAO();
+    	List<Utente> utenti = utenteDAO.getAll();
+    	ObservableList<Utente> listaUtenti = FXCollections.observableArrayList(utenti);
+    	tableView.setItems(listaUtenti);
 	}
 	
 	/**
 	 * handles the click on Add button
 	 */
 	public void handleAddUser() {
-		if(inputIsValid())
-	    	tableView.getItems().add(new Utente(
-	    			textNome.getText(),
-	    			textCognome.getText(),
-	    			textUsername.getText(),
-	    			textPassword.getText(),    			
-	    			comboRuolo.getValue()
-	    		)
-	    	);
+		DAO<Utente> utenteDAO = database.getUtenteDAO();
+		
+		if(inputIsValid()) {
+			Ruolo ruolo = comboRuolo.getValue();
+			Utente utente = null;
+			switch(ruolo) {
+		    	case ADMIN: 
+		    		utente = new Admin(textNome.getText(), textCognome.getText(), textUsername.getText(), toHash(textPassword.getText()));
+		    		break;
+		    	case ANALISTA:
+		    		utente = new Analista(textNome.getText(), textCognome.getText(), textUsername.getText(), toHash(textPassword.getText()));
+		    		break;
+		    	case AUTORIZZATO: 
+		    		utente = new Autorizzato(textNome.getText(), textCognome.getText(), textUsername.getText(), toHash(textPassword.getText()));
+		    		break;
+		    	case CONTRATTO:
+		    		utente = new Contratto(textNome.getText(), textCognome.getText(), textUsername.getText(), toHash(textPassword.getText()));
+		    		break;
+			}
+			utente.setId(utenteDAO.create(utente));
+			
+			tableView.getItems().add(utente);
+		}
+						
     	clearTextFields();
+    }
+	
+	public static String toHash(String text) {
+        String hash = null;
+        try {
+            byte[] textData = text.getBytes("UTF-8");
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] digest = messageDigest.digest(textData);
+            hash = new BigInteger(digest).toString(16);
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+        	e.printStackTrace();
+        }
+        return hash;
     }
 	
 	/**
@@ -77,7 +123,7 @@ public class AdminInterfaceController implements Initializable {
 		for(Utente u: tableView.getItems())
 			if(textUsername.getText().equals(u.getUsername())) {
 				Alert alert = new Alert(AlertType.ERROR);
-				alert.setHeaderText("Username già occupato!");
+				alert.setHeaderText("Username giï¿½ occupato!");
 				alert.showAndWait();
 				return false;
 			}
