@@ -52,6 +52,7 @@ public class AdminInterfaceController implements Initializable {
     private int index = -1;
     
     private MySqlDAOFactory database;
+    private ObservableList<Utente> listaUtenti = FXCollections.observableArrayList();
 
     /**
      * initialize is the first method to be invoked
@@ -67,7 +68,8 @@ public class AdminInterfaceController implements Initializable {
     	database = new MySqlDAOFactory();
     	DAO<Utente> utenteDAO = database.getUtenteDAO();
     	List<Utente> utenti = utenteDAO.getAll();
-    	ObservableList<Utente> listaUtenti = FXCollections.observableArrayList(utenti);
+    	//ObservableList<Utente> listaUtenti = FXCollections.observableArrayList(utenti);
+    	listaUtenti.addAll(utenti);
     	tableView.setItems(listaUtenti);
 	}
 	
@@ -140,6 +142,9 @@ public class AdminInterfaceController implements Initializable {
 		ObservableList<Utente> allItems = tableView.getItems();
 		if(!allItems.isEmpty())
 			selectedItems.forEach(allItems::remove);
+		
+		Utente utente = selectedItems.get(0);
+		database.getUtenteDAO().delete(utente);
 	}
 	
 	
@@ -147,6 +152,17 @@ public class AdminInterfaceController implements Initializable {
 		/*
 		 * update in the database
 		 */
+		ObservableList<Utente> selectedItems = tableView.getSelectionModel().getSelectedItems();
+		
+		Utente utente = selectedItems.get(0);
+		utente.setNome(textNome.getText());
+		utente.setCognome(textCognome.getText());
+		utente.setUsername(textUsername.getText());
+		
+		database.getUtenteDAO().update(utente);
+		
+		tableView.refresh();
+		
 	}
 	
 	public void getSelected(MouseEvent event) {

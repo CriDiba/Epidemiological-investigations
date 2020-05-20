@@ -31,6 +31,10 @@ public abstract class Utente {
     public String getNome() {
         return nome;
     }
+    
+    public void setNome(String nome) {
+        this.nome =  nome;
+    }
 
     public String getCognome() {
         return cognome;
@@ -55,5 +59,15 @@ public abstract class Utente {
     public void setRuolo(Ruolo ruolo) {
     	this.ruolo = ruolo;
     }
+
+	public void setCognome(String cognome) {
+		this.cognome = cognome;
+		
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+		
+	}
         
 }
