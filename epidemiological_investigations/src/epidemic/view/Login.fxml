@@ -16,7 +16,7 @@
          <children>
             <Text layoutX="112.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, please log in!" textAlignment="CENTER" wrappingWidth="276.53668785095215" AnchorPane.bottomAnchor="220.11874999999998" AnchorPane.leftAnchor="112.0" AnchorPane.rightAnchor="111.46331214904785" AnchorPane.topAnchor="34.60546875">
                <font>
-                  <Font name="Microsoft YaHei" size="24.0" />
+                  <Font name="Calibri" size="26.0" />
                </font>
             </Text>
             <TextField layoutX="166.0" layoutY="116.0" prefHeight="26.0" prefWidth="204.0" promptText="Username" AnchorPane.bottomAnchor="144.0" AnchorPane.leftAnchor="166.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="116.0" />

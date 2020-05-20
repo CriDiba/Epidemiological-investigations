@@ -51,9 +51,6 @@ public class MainClass extends Application{
             // Set login screen into the center of root layout.
             rootLayout.setCenter(LoginScreen);
             
-            //Set stage not resizable
-            primaryStage.setResizable(false);
-            
             //set reference to main class
             LoginController controller = loader.getController();
             controller.setMainReference(this);
