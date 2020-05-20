@@ -20,7 +20,7 @@
                </font>
             </Text>
             <TextField layoutX="166.0" layoutY="116.0" prefHeight="26.0" prefWidth="204.0" promptText="Username" AnchorPane.bottomAnchor="144.0" AnchorPane.leftAnchor="166.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="116.0" />
-            <PasswordField layoutX="166.0" layoutY="157.0" prefHeight="26.0" prefWidth="204.0" promptText="Password" AnchorPane.bottomAnchor="103.0" AnchorPane.leftAnchor="166.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="157.0" />
+            <PasswordField fx:id="pwd" layoutX="166.0" layoutY="157.0" prefHeight="26.0" prefWidth="204.0" promptText="Password" AnchorPane.bottomAnchor="103.0" AnchorPane.leftAnchor="166.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="157.0" />
             <Button layoutX="224.0" layoutY="212.0" mnemonicParsing="false" onAction="#handleLogin" text="Login" AnchorPane.bottomAnchor="48.799999999999976" AnchorPane.leftAnchor="224.0" AnchorPane.rightAnchor="230.4" AnchorPane.topAnchor="212.0" />
             <ImageView fitHeight="32.0" fitWidth="26.0" layoutX="128.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="144.39999999999998" AnchorPane.leftAnchor="128.0" AnchorPane.rightAnchor="346.0" AnchorPane.topAnchor="116.0">
                <image>
