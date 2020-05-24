@@ -1,6 +1,6 @@
 package epidemic.model;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class Comune extends Localita {
 	private final String istat;
@@ -35,7 +35,7 @@ public class Comune extends Localita {
 		return territorio;
 	}
 
-	public boolean isSulMare() {
+	public boolean getSulMare() {
 		return sulMare;
 	}
 

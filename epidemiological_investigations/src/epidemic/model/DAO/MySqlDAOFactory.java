@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
 
+
 public class MySqlDAOFactory {
 	
     /**
@@ -35,6 +36,16 @@ public class MySqlDAOFactory {
 		return new UtenteDAO();
 	}
 	
-	//Posso restituire VARI DAO 
+	public RegioneDAO getRegioneDAO() throws IOException {
+		return RegioneDAO.getIstance();
+	}
+
+	public ProvinciaDAO getProvinciaDAO() throws IOException {
+		return ProvinciaDAO.getIstance();
+	}
+	
+	public ComuneDAO getComuneDAO() throws IOException {
+		return ComuneDAO.getIstance();
+	}
 
 }

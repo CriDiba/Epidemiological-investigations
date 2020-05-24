@@ -1,6 +1,6 @@
 package epidemic.model;
 
-public class Utente {
+public abstract class Utente {
 	
 	private int id;
     private String nome;

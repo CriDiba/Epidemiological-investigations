@@ -1,8 +1,9 @@
 package epidemic.model;
 
-public class Localita {
+public abstract class Localita {
 	private String nome;
 	private float superficie;
+	private int id;
 	
 	public Localita(String nome, float superficie) {
 		boolean hasDigit = nome.matches(".*\\d+.*");
@@ -15,6 +16,14 @@ public class Localita {
 		this.superficie = superficie;
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
