@@ -7,8 +7,8 @@ public class Localita {
 	public Localita(String nome, float superficie) {
 		boolean hasDigit = nome.matches(".*\\d+.*");
 		
-		if(nome.isEmpty() || Character.isLowerCase(nome.charAt(0))
-				|| hasDigit || superficie < 0)
+		if(nome.isBlank() || Character.isLowerCase(nome.charAt(0))
+				|| nome == null || hasDigit || superficie < 0)
 			throw new IllegalArgumentException();
 
 		this.nome = nome;
