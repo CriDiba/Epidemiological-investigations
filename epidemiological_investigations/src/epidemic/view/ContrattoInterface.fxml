@@ -17,7 +17,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
@@ -31,6 +30,7 @@
               <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -39,20 +39,20 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label prefHeight="18.0" prefWidth="264.0" text="Influenza e complicazioni respiratorie" GridPane.rowIndex="1" />
-                  <Label prefHeight="18.0" prefWidth="264.0" text="Polmoniti" GridPane.rowIndex="2" />
-                  <Label prefHeight="18.0" prefWidth="264.0" text="Meningiti" GridPane.rowIndex="3" />
-                  <Label prefHeight="18.0" prefWidth="264.0" text="Epatiti" GridPane.rowIndex="4" />
-                  <Label prefHeight="18.0" prefWidth="264.0" text="Morbillo" GridPane.rowIndex="5" />
-                  <Label prefHeight="18.0" prefWidth="264.0" text="Tubercolosi" GridPane.rowIndex="6" />
-                  <Label prefHeight="18.0" prefWidth="264.0" text="Gastroenteriti" GridPane.rowIndex="7" />
+                  <Label prefHeight="18.0" prefWidth="264.0" text="Influenza" GridPane.rowIndex="1" />
+                  <Label prefHeight="18.0" prefWidth="264.0" text="Polmoniti" GridPane.rowIndex="3" />
+                  <Label prefHeight="18.0" prefWidth="264.0" text="Meningiti" GridPane.rowIndex="4" />
+                  <Label prefHeight="18.0" prefWidth="264.0" text="Epatiti" GridPane.rowIndex="5" />
+                  <Label prefHeight="18.0" prefWidth="264.0" text="Morbillo" GridPane.rowIndex="6" />
+                  <Label prefHeight="18.0" prefWidth="264.0" text="Tubercolosi" GridPane.rowIndex="7" />
+                  <Label prefHeight="18.0" prefWidth="264.0" text="Gastroenteriti" GridPane.rowIndex="8" />
                   <Spinner fx:id="spinInfluenze" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Spinner fx:id="spinPolmoniti" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Spinner fx:id="spinMeningiti" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <Spinner fx:id="spinEpatiti" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <Spinner fx:id="spinMorbillo" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <Spinner fx:id="spinTubercolosi" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <Spinner fx:id="spinGastroenteriti" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <Spinner fx:id="spinPolmoniti" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Spinner fx:id="spinMeningiti" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Spinner fx:id="spinEpatiti" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <Spinner fx:id="spinMorbillo" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <Spinner fx:id="spinTubercolosi" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <Spinner fx:id="spinGastroenteriti" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Malattia" wrappingWidth="143.7366943359375">
                      <font>
                         <Font name="Calibri" size="27.0" />
@@ -63,18 +63,21 @@
                         <Font name="Calibri" size="26.0" />
                      </font>
                   </Text>
-                  <Label text="0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                  <Label text="0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                  <Label text="0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                  <Label text="0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                  <Label text="0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                  <Label text="0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                  <Label text="0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                  <Label fx:id="lblInfluenze" text="0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Label fx:id="lblPolmoniti" text="0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <Label fx:id="lblMeningiti" text="0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                  <Label fx:id="lblEpatiti" text="0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                  <Label fx:id="lblMorbillo" text="0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                  <Label fx:id="lblTubercolosi" text="0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                  <Label fx:id="lblGastroenteriti" text="0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Casi precedenti" wrappingWidth="163.7366943359375" GridPane.columnIndex="2">
                      <font>
                         <Font name="Calibri" size="26.0" />
                      </font>
                   </Text>
+                  <Label prefHeight="18.0" prefWidth="264.0" text="Influenza e complicazioni respiratorie" GridPane.rowIndex="2" />
+                  <Spinner fx:id="spinComplicazioni" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label fx:id="lblComplicazioni" text="0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                </children>
             </GridPane>
          </children>

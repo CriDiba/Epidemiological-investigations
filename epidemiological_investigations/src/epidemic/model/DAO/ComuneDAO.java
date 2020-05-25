@@ -11,9 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import epidemic.model.Admin;
+import epidemic.model.Analista;
+import epidemic.model.Autorizzato;
 import epidemic.model.Comune;
+import epidemic.model.Contratto;
 import epidemic.model.Provincia;
+import epidemic.model.Ruolo;
 import epidemic.model.Territorio;
+import epidemic.model.Utente;
 
 public class ComuneDAO implements DAO<Comune>{
 	
@@ -31,6 +37,45 @@ public class ComuneDAO implements DAO<Comune>{
 		if(istance == null)
 			istance = new ComuneDAO();
 		return istance;
+	}
+	
+	public Comune getComuneDaNome(String nomeComune) {
+		Comune comune = null;
+		Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet result = null;
+        
+        try {
+        	connection = MySqlDAOFactory.createConnection();
+            preparedStatement = connection.prepareStatement(queries.getProperty("nome_query"));
+            preparedStatement.setString(1, nomeComune);
+            preparedStatement.execute();
+            result = preparedStatement.getResultSet();
+ 
+            if (result.next() && result != null)
+            	comune = getComuneFromRS(result);
+           
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                result.close();
+            } catch (Exception rse) {
+                rse.printStackTrace();
+            }
+            try {
+                preparedStatement.close();
+            } catch (Exception sse) {
+                sse.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (Exception cse) {
+                cse.printStackTrace();
+            }
+        }
+ 
+        return comune;
 	}
 	
 	@Override
