@@ -50,7 +50,7 @@
                   <Spinner fx:id="spinPolmoniti" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Spinner fx:id="spinMeningiti" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <Spinner fx:id="spinEpatiti" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <Spinner fx:id="spinMorbillo" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <Spinner fx:id="spinMorbillos" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                   <Spinner fx:id="spinTubercolosi" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                   <Spinner fx:id="spinGastroenteriti" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Malattia" wrappingWidth="143.7366943359375">
