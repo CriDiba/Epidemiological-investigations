@@ -22,7 +22,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
 	private ProvinciaDAO() throws IOException {
 		InputStream queryFile = null;
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("provinceQueries.properties");
+		queryFile = getClass().getResourceAsStream("/queries/provinceQueries.properties");
 		queries.load(queryFile);
 	}
 	

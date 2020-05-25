@@ -24,7 +24,7 @@ public class RegioneDAO implements DAO<Regione> {
 	private RegioneDAO() throws IOException {
 		InputStream queryFile = null;
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("regioniQueries.properties");
+		queryFile = getClass().getResourceAsStream("/queries/regioniQueries.properties");
 		queries.load(queryFile);
 	}
 	

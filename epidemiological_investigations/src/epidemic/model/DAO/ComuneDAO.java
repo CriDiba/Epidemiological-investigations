@@ -22,7 +22,7 @@ public class ComuneDAO implements DAO<Comune>{
 	private ComuneDAO() throws IOException {
 		InputStream queryFile = null;
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("comuniQueries.properties");
+		queryFile = getClass().getResourceAsStream("/queries/comuniQueries.properties");
 		queries.load(queryFile);
 	}
 	
@@ -127,7 +127,7 @@ public class ComuneDAO implements DAO<Comune>{
 			preparedStatement.setDate(4, comune.getDataIstituzione());
 			preparedStatement.setInt(5, comune.getTerritorio().ordinal());
 			preparedStatement.setBoolean(6, comune.getSulMare());
-			preparedStatement.setString(7, comune.getProvincia().getNome());
+			preparedStatement.setString(7, comune.getProvinciaAppartenenza().getNome());
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -170,7 +170,7 @@ public class ComuneDAO implements DAO<Comune>{
 			preparedStatement.setDate(4, comune.getDataIstituzione());
 			preparedStatement.setInt(5, comune.getTerritorio().ordinal());
 			preparedStatement.setBoolean(6, comune.getSulMare());
-			preparedStatement.setString(7, comune.getProvincia().getNome());
+			preparedStatement.setString(7, comune.getProvinciaAppartenenza().getNome());
             preparedStatement.execute();
             return true;
         } catch (SQLException e) {
