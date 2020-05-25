@@ -22,7 +22,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
 	private ProvinciaDAO() throws IOException {
 		InputStream queryFile = null;
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("provinceQueries.properties");
+		queryFile = getClass().getResourceAsStream("/queries/provinceQueries.properties");
 		queries.load(queryFile);
 	}
 	
@@ -47,7 +47,8 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	provinces.add(new Provincia(/*da riempire in base al database*/));
+	           	provinces.add(new Provincia(result.getString("nome"), result.getDouble("superficie"), 
+            			result.getString("capoluogo"), result.get..));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -87,7 +88,8 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	provincia = new Provincia(/************/);
+            	provincia = new Provincia(result.getString("nome"), result.getDouble("superficie"), 
+            			result.getString("capoluogo"), result.get..);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -121,10 +123,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, provincia.getNome());
-            preparedStatement.setFloat(2, provincia.getSuperficie());
-            preparedStatement.setString(3, provincia.getCapoluogo().getNome());
-            preparedStatement.setString(4, provincia.getRegioneAppartenenza().getNome());
+            setPreparedStatementFromProvincia(preparedStatement, provincia);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -154,6 +153,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
         return -1;
 	}
 
+
 	@Override
 	public boolean update(Provincia provincia) {
 		Connection connection = null;
@@ -161,10 +161,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            preparedStatement.setString(1, provincia.getNome());
-            preparedStatement.setFloat(2, provincia.getSuperficie());
-            preparedStatement.setString(3, provincia.getCapoluogo().getNome());
-            preparedStatement.setString(4, provincia.getRegioneAppartenenza().getNome());
+            setPreparedStatementFromProvincia(preparedStatement, provincia);
             preparedStatement.execute();
             return true;
         } catch (SQLException e) {
@@ -211,4 +208,10 @@ public class ProvinciaDAO implements DAO<Provincia>{
 		return false;
 	}
 
+	private void setPreparedStatementFromProvincia(PreparedStatement preparedStatement, Provincia provincia) throws SQLException {
+		preparedStatement.setString(1, provincia.getNome());
+        preparedStatement.setDouble(2, provincia.getSuperficie());
+        preparedStatement.setString(3, provincia.getCapoluogo());
+        preparedStatement.setString(4, provincia.getRegioneAppartenenza().getNome());
+	}
 }

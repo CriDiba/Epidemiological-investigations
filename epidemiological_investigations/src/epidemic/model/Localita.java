@@ -2,18 +2,20 @@ package epidemic.model;
 
 public abstract class Localita {
 	private String nome;
-	private float superficie;
+	private double superficie;
 	private int id;
 	
-	public Localita(String nome, float superficie) {
-		boolean hasDigit = nome.matches(".*\\d+.*");
-		
-		if(nome.isBlank() || Character.isLowerCase(nome.charAt(0))
-				|| nome == null || hasDigit || superficie < 0)
+	public Localita(String nome, double superficie) {
+		if(!isValid(nome) || superficie < 0)
 			throw new IllegalArgumentException();
 
 		this.nome = nome;
 		this.superficie = superficie;
+	}
+	
+	public boolean isValid(String nome) {
+		boolean hasDigit = nome.matches(".*\\d+.*");
+		return !(nome.isBlank() || Character.isLowerCase(nome.charAt(0)) || nome == null || hasDigit);
 	}
 	
 	public int getId() {
@@ -36,7 +38,7 @@ public abstract class Localita {
 		this.superficie = superficie;
 	}
 	
-	public float getSuperficie() {
+	public double getSuperficie() {
 		return superficie;
 	}
 }

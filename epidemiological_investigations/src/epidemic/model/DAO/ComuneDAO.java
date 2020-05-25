@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import epidemic.model.Comune;
 import epidemic.model.Provincia;
+import epidemic.model.Territorio;
 
 public class ComuneDAO implements DAO<Comune>{
 	
@@ -22,7 +23,7 @@ public class ComuneDAO implements DAO<Comune>{
 	private ComuneDAO() throws IOException {
 		InputStream queryFile = null;
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("comuniQueries.properties");
+		queryFile = getClass().getResourceAsStream("/queries/comuniQueries.properties");
 		queries.load(queryFile);
 	}
 	
@@ -47,7 +48,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-            	municipalities.add(new Comune(/*da riempire in base al database*/));
+            	municipalities.add(getComuneFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -87,7 +88,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	comune = new Comune(/************/);
+            	comune = getComuneFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -121,13 +122,7 @@ public class ComuneDAO implements DAO<Comune>{
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, comune.getNome());
-            preparedStatement.setFloat(2, comune.getSuperficie());
-            preparedStatement.setString(3, comune.getIstat());
-			preparedStatement.setDate(4, comune.getDataIstituzione());
-			preparedStatement.setInt(5, comune.getTerritorio().ordinal());
-			preparedStatement.setBoolean(6, comune.getSulMare());
-			preparedStatement.setString(7, comune.getProvincia().getNome());
+            setPreparedStatementFromComune(preparedStatement, comune);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -164,13 +159,7 @@ public class ComuneDAO implements DAO<Comune>{
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            preparedStatement.setString(1, comune.getNome());
-            preparedStatement.setFloat(2, comune.getSuperficie());
-            preparedStatement.setString(3, comune.getIstat());
-			preparedStatement.setDate(4, comune.getDataIstituzione());
-			preparedStatement.setInt(5, comune.getTerritorio().ordinal());
-			preparedStatement.setBoolean(6, comune.getSulMare());
-			preparedStatement.setString(7, comune.getProvincia().getNome());
+            setPreparedStatementFromComune(preparedStatement, comune);
             preparedStatement.execute();
             return true;
         } catch (SQLException e) {
@@ -216,5 +205,25 @@ public class ComuneDAO implements DAO<Comune>{
         }
 		return false;
 	}
+	
+	private void setPreparedStatementFromComune(PreparedStatement preparedStatement, Comune comune) throws SQLException {
+		preparedStatement.setString(1, comune.getNome());
+        preparedStatement.setDouble(2, comune.getSuperficie());
+        preparedStatement.setString(3, comune.getIstat());
+		preparedStatement.setDate(4, comune.getDataIstituzione());
+		preparedStatement.setInt(5, comune.getTerritorio().ordinal());
+		preparedStatement.setBoolean(6, comune.getSulMare());
+		preparedStatement.setString(7, comune.getProvinciaAppartenenza().getNome());
+		
+	}
+	
+	private Comune getComuneFromRS(ResultSet result) {
+		new Comune(result.getString("nome"), result.getDouble("superficie"), result.getString("istat"),
+				result.getDate("dataIstituzione"), Territorio.values()[result.getInt("territorio")], result.getBoolean("sulMare")/*, result.getint()??*/);
+	}
+
 
 }
+
+
+
