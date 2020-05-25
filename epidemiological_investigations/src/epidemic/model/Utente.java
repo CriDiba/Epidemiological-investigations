@@ -69,5 +69,10 @@ public abstract class Utente {
 		this.username = username;
 		
 	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+		
+	}
         
 }

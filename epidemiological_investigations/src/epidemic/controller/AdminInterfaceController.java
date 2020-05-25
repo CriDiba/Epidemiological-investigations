@@ -18,6 +18,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -45,12 +46,11 @@ public class AdminInterfaceController implements Initializable {
     @FXML
     private TextField textUsername;
     @FXML
-    private TextField textPassword;
+    private PasswordField textPassword;
     @FXML
     private ComboBox<Ruolo> comboRuolo;
     
-    private int index = -1;
-    
+   
     private MySqlDAOFactory database;
     private ObservableList<Utente> listaUtenti = FXCollections.observableArrayList();
 
@@ -64,12 +64,10 @@ public class AdminInterfaceController implements Initializable {
 		initTableCols();
     	comboRuolo.getItems().addAll(Ruolo.values());
     	
-    	//Visualizzo le entry del DB
     	database = new MySqlDAOFactory();
-    	DAO<Utente> utenteDAO = database.getUtenteDAO();
-    	List<Utente> utenti = utenteDAO.getAll();
-    	//ObservableList<Utente> listaUtenti = FXCollections.observableArrayList(utenti);
+    	List<Utente> utenti = database.getUtenteDAO().getAll();
     	listaUtenti.addAll(utenti);
+    	
     	tableView.setItems(listaUtenti);
 	}
 	
@@ -122,10 +120,10 @@ public class AdminInterfaceController implements Initializable {
 	 * @return
 	 */
 	private boolean inputIsValid() {
-		for(Utente u: tableView.getItems())
-			if(textUsername.getText().equals(u.getUsername())) {
+		for(Utente utente: listaUtenti)
+			if(textUsername.getText().equals(utente.getUsername())) {
 				Alert alert = new Alert(AlertType.ERROR);
-				alert.setHeaderText("Username gi� occupato!");
+				alert.setHeaderText("Username gia' occupato!");
 				alert.showAndWait();
 				return false;
 			}
@@ -138,44 +136,53 @@ public class AdminInterfaceController implements Initializable {
 	 * delete selected rows of the table
 	 */
 	public void handleDeleteSelected() {
-		ObservableList<Utente> selectedItems = tableView.getSelectionModel().getSelectedItems();
-		ObservableList<Utente> allItems = tableView.getItems();
-		if(!allItems.isEmpty())
-			selectedItems.forEach(allItems::remove);
-		
-		Utente utente = selectedItems.get(0);
-		database.getUtenteDAO().delete(utente);
+		Utente utente = tableView.getSelectionModel().getSelectedItem();
+        if (utente != null) {
+    		database.getUtenteDAO().delete(utente);
+        	tableView.getItems().remove(utente);
+        } else {
+            // Nothing selected.
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText("No Person Selected");
+            alert.setContentText("Please select a person in the table.");
+            alert.showAndWait();
+        }
+        
+        clearTextFields();
 	}
 	
 	
 	public void handleEditUser() {
-		/*
-		 * update in the database
-		 */
-		ObservableList<Utente> selectedItems = tableView.getSelectionModel().getSelectedItems();
-		
-		Utente utente = selectedItems.get(0);
+
+		Utente utente = tableView.getSelectionModel().getSelectedItem();
+
 		utente.setNome(textNome.getText());
 		utente.setCognome(textCognome.getText());
 		utente.setUsername(textUsername.getText());
+		utente.setRuolo(comboRuolo.getValue());
 		
+		if(utente.getPassword() != textPassword.getText())
+			utente.setPassword(toHash(textPassword.getText()));
+	
 		database.getUtenteDAO().update(utente);
 		
 		tableView.refresh();
-		
 	}
 	
+	
 	public void getSelected(MouseEvent event) {
-		index = tableView.getSelectionModel().getSelectedIndex();
-		if(index <= -1)
-			return;
 		
-		textNome.setText(colNome.getCellData(index));
-		textCognome.setText(colCognome.getCellData(index));
-		textUsername.setText(colUsername.getCellData(index));
-		textPassword.setText(colPassword.getCellData(index));
-		comboRuolo.setValue(colRuolo.getCellData(index));
+		Utente utente = tableView.getSelectionModel().getSelectedItem();
+		if (utente != null) {
+			textNome.setText(utente.getNome());
+			textCognome.setText(utente.getCognome());
+			textUsername.setText(utente.getUsername());
+			textPassword.setText(utente.getPassword());
+			comboRuolo.setValue(utente.getRuolo());
+        }
 	}
+	
 	
 	/**
 	 * clears textfields

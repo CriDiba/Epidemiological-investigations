@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -49,11 +50,7 @@
             <TextField fx:id="textNome" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="173.0" promptText="Nome" />
             <TextField fx:id="textCognome" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="173.0" promptText="Cognome" GridPane.rowIndex="1" />
             <TextField fx:id="textUsername" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="173.0" promptText="Username" GridPane.columnIndex="1" />
-            <TextField fx:id="textPassword" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="173.0" promptText="Password" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </TextField>
+            <PasswordField fx:id="textPassword" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="173.0" promptText="Password" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <ComboBox fx:id="comboRuolo" prefHeight="26.0" prefWidth="174.0" promptText="Ruolo" GridPane.rowIndex="2" />
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
