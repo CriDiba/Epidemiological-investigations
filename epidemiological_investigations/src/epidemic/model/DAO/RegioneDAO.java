@@ -10,10 +10,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import epidemic.model.Comune;
-import epidemic.model.Localita;
-import epidemic.model.Provincia;
 import epidemic.model.Regione;
 
 public class RegioneDAO implements DAO<Regione> {
@@ -49,7 +45,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	regions.add(new Regione(/*da riempire in base al database*/));
+	           	regions.add(new Regione(result.getString(1), result.getDouble(2), result.getString(3)));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -89,7 +85,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	regione = new Regione(/************/);
+            	regione = new Regione(result.getString(1), result.getDouble(2), result.getString(3));
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -123,9 +119,7 @@ public class RegioneDAO implements DAO<Regione> {
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, regione.getNome());
-            preparedStatement.setFloat(2, regione.getSuperficie());
-            preparedStatement.setString(3, regione.getCapoluogo().getNome());            
+            setPreparedStatementFromRegione(preparedStatement, regione);           
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -162,9 +156,7 @@ public class RegioneDAO implements DAO<Regione> {
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            preparedStatement.setString(1, regione.getNome());
-            preparedStatement.setFloat(2, regione.getSuperficie());
-            preparedStatement.setString(3, regione.getCapoluogo().getNome());
+            setPreparedStatementFromRegione(preparedStatement, regione);
             preparedStatement.execute();
             return true;
         } catch (SQLException e) {
@@ -209,6 +201,12 @@ public class RegioneDAO implements DAO<Regione> {
             }
         }
 		return false;
+	}
+	
+	private void setPreparedStatementFromRegione(PreparedStatement preparedStatement, Regione regione) throws SQLException {
+		 preparedStatement.setString(1, regione.getNome());
+         preparedStatement.setDouble(2, regione.getSuperficie());
+         preparedStatement.setString(3, regione.getCapoluogo());
 	}
 
 }

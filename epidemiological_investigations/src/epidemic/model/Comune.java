@@ -12,7 +12,7 @@ public class Comune extends Localita {
 	private Contratto responsabile;
 	private List<Segnalazione> segnalazioniContagi;
 	
-	public Comune(String nome, float superficie, String istat, Date dataIstituzione, Territorio territorio, boolean sulMare, Provincia provinciaAppartenenza) {
+	public Comune(String nome, double superficie, String istat, Date dataIstituzione, Territorio territorio, boolean sulMare, Provincia provinciaAppartenenza) {
 		super(nome, superficie);
 		
 		if(!istat.chars().allMatch(c -> Character.isDigit(c)) || istat.length() != 6)

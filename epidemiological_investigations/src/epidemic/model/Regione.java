@@ -1,14 +1,16 @@
 package epidemic.model;
 
 public class Regione extends Localita{
-	private Comune capoluogo;
+	private String capoluogo;
 	
-	public Regione(String nome, float superficie, Comune capoluogo) {
+	public Regione(String nome, double superficie, String capoluogo) {
 		super(nome, superficie);
+		if(!isValid(capoluogo))
+			throw new IllegalArgumentException();
 		this.capoluogo = capoluogo;
 	}
 	
-	public Comune getCapoluogo() {
+	public String getCapoluogo() {
 		return capoluogo;
 	}
 
