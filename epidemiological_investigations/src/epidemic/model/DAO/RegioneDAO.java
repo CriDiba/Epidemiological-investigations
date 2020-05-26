@@ -159,6 +159,7 @@ public class RegioneDAO implements DAO<Regione> {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromRegione(preparedStatement, regione);
+            preparedStatement.setInt(4, regione.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {

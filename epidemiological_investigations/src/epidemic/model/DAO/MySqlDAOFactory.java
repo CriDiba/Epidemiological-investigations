@@ -52,4 +52,11 @@ public class MySqlDAOFactory {
 		return SegnalazioneContagiDAO.getIstance();
 	}
 
+
+
+	public ContagioDAO getContagioDAO() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

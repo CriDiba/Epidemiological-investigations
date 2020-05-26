@@ -47,9 +47,9 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             result = preparedStatement.getResultSet();
            
             while(result.next())
-            	segnContagi.add(getSegnalazioneFromRS(result, connection));
+            	segnContagi.add(getSegnalazioneFromRS(result));
            
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -88,9 +88,9 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	segnContagi = getSegnalazioneFromRS(result, connection);
+            	segnContagi = getSegnalazioneFromRS(result);
             
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -189,7 +189,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
-            preparedStatement.setInt(1, segnContagi.getId());
+            preparedStatement.setInt(3, segnContagi.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -209,25 +209,22 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 		return success;
 	}
 	
-	private void setPreparedStatementFromSegnalazione(PreparedStatement preparedStatement, SegnalazioneContagi segnContagi) {
-		// TODO Auto-generated method stub
-		
+	private void setPreparedStatementFromSegnalazione(PreparedStatement preparedStatement, SegnalazioneContagi segnContagi) throws SQLException {
+		preparedStatement.setDate(1, segnContagi.getData());
+		preparedStatement.setInt(2, segnContagi.getComuneRiferimento().getId());
 	}
 	
-	private SegnalazioneContagi getSegnalazioneFromRS(ResultSet result, Connection connection) throws IOException, SQLException {
-		PreparedStatement getContagi = connection.prepareStatement(queries.getProperty("get_contagi_query"));
-		getContagi.setInt(1, result.getInt("id"));
-		getContagi.execute();
-		ResultSet contagi = getContagi.getResultSet();
-		
-		List<Contagio> listaContagi = new ArrayList<>();
-		while(contagi.next())
-			listaContagi.add(new Contagio(MalattiaContagiosa.values()[contagi.getInt("malattia")],
-					contagi.getInt("persone_ricoverate"),
-					contagi.getInt("persone_in_cura")));
-		
+	private SegnalazioneContagi getSegnalazioneFromRS(ResultSet result) throws SQLException {
 		MySqlDAOFactory database = new MySqlDAOFactory();
-		Comune comune = database.getComuneDAO().get(result.getInt("id_comune"));
+		List<Contagio> listaContagi = new ArrayList<>();
+		Comune comune = null;
+		try {
+			listaContagi = database.getContagioDAO().getAll();			
+			comune = database.getComuneDAO().get(result.getInt("id_comune"));
+		} catch(IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 		
 		return new SegnalazioneContagi(listaContagi, result.getDate("data"), comune);
 	}

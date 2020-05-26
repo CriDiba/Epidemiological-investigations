@@ -50,7 +50,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
  
             if (result != null)
-            	comune = getComuneFromRS(result, connection);
+            	comune = getComuneFromRS(result);
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -129,7 +129,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-            	municipalities.add(getComuneFromRS(result, connection));
+            	municipalities.add(getComuneFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -169,7 +169,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	comune = getComuneFromRS(result, connection);
+            	comune = getComuneFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -243,6 +243,7 @@ public class ComuneDAO implements DAO<Comune>{
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromComune(preparedStatement, comune);
+            preparedStatement.setInt(8, comune.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -301,14 +302,16 @@ public class ComuneDAO implements DAO<Comune>{
 		
 	}
 	
-	private Comune getComuneFromRS(ResultSet result, Connection connection) throws SQLException {
-			
-		PreparedStatement getProvincia = connection.prepareStatement(queries.getProperty("get_provincia_query"));
-		getProvincia.setInt(1, result.getInt("id_responsabile"));
-		getProvincia.execute();
-		ResultSet datiProvincia = getProvincia.getResultSet();
-		Provincia provincia = new Provincia(datiProvincia.getString("nome"), datiProvincia.getDouble("superficie"), datiProvincia.getString("capoluogo"), null);
+	private Comune getComuneFromRS(ResultSet result) throws SQLException {
+		MySqlDAOFactory database = new MySqlDAOFactory();
+		Provincia provincia;
 		
+		try {
+			provincia = database.getProvinciaDAO().get(result.getInt("id_provincia"));
+		} catch(IOException e) {
+			e.printStackTrace();
+			return null;
+		}		
 		
 		Comune comune = new Comune(result.getString("nome"), result.getDouble("superficie"), result.getString("istat"),
 				result.getDate("data_istituzione"), Territorio.values()[result.getInt("territorio")], result.getBoolean("mare"), provincia);

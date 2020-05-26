@@ -1,6 +1,6 @@
 package epidemic.model;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 public class SegnalazioneContagi {
