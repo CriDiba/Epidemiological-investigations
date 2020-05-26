@@ -47,8 +47,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	provinces.add(new Provincia(result.getString("nome"), result.getDouble("superficie"), 
-            			result.getString("capoluogo"), result.get..));
+	           	provinces.add(getProvinciaFromRS(result, connection));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -88,8 +87,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	provincia = new Provincia(result.getString("nome"), result.getDouble("superficie"), 
-            			result.getString("capoluogo"), result.get..);
+            	provincia = getProvinciaFromRS(result, connection);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -213,5 +211,16 @@ public class ProvinciaDAO implements DAO<Provincia>{
         preparedStatement.setDouble(2, provincia.getSuperficie());
         preparedStatement.setString(3, provincia.getCapoluogo());
         preparedStatement.setString(4, provincia.getRegioneAppartenenza().getNome());
+	}
+	
+	private Provincia getProvinciaFromRS(ResultSet result, Connection connection) throws SQLException {
+		PreparedStatement getRegione = connection.prepareStatement(queries.getProperty("get_regione_query"));
+		getRegione.setInt(1, result.getInt("id_regione"));
+		getRegione.execute();
+		ResultSet regione = getRegione.getResultSet();
+		
+		return new Provincia(result.getString("nome"), result.getDouble("superficie"), 
+    			result.getString("capoluogo"), new Regione(regione.getString("nome"), regione.getDouble("superficie"),
+    					regione.getString("capoluogo")));
 	}
 }
