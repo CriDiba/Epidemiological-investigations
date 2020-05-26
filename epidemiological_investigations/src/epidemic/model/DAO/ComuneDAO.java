@@ -36,8 +36,8 @@ public class ComuneDAO implements DAO<Comune>{
 		return istance;
 	}
 	
-	public int getIdDaNome(String nomeComune) {
-		int idComune = -1;
+	public Comune getComuneDaNome(String nomeComune) {
+		Comune comune = null;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -50,7 +50,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
  
             if (result != null)
-            	idComune = result.getInt("id");
+            	comune = getComuneFromRS(result, connection);
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,7 +72,7 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
  
-        return idComune;
+        return comune;
 	}
 	
 	public ObservableList<String> getNomeComuniPerResponsabile(int idUtenteContratto) {
@@ -196,6 +196,7 @@ public class ComuneDAO implements DAO<Comune>{
 
 	@Override
 	public int create(Comune comune) {
+		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -208,7 +209,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getGeneratedKeys();
             
             if (result.next() && result != null)
-                return result.getInt(1);
+                success = result.getInt(1);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -230,11 +231,12 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
  
-        return -1;
+        return success;
 	}
 
 	@Override
 	public boolean update(Comune comune) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -242,7 +244,7 @@ public class ComuneDAO implements DAO<Comune>{
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromComune(preparedStatement, comune);
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -257,11 +259,12 @@ public class ComuneDAO implements DAO<Comune>{
                 cse.printStackTrace();
             }
         }
-        return false;
+        return success;
 	}
 
 	@Override
 	public boolean delete(Comune comune) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -269,7 +272,7 @@ public class ComuneDAO implements DAO<Comune>{
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
             preparedStatement.setInt(1, comune.getId());
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -284,7 +287,7 @@ public class ComuneDAO implements DAO<Comune>{
                 cse.printStackTrace();
             }
         }
-		return false;
+		return success;
 	}
 	
 	private void setPreparedStatementFromComune(PreparedStatement preparedStatement, Comune comune) throws SQLException {

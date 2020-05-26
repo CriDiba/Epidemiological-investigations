@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import com.mysql.cj.util.Util;
-
 import epidemic.model.Comune;
 import epidemic.model.Contagio;
+import epidemic.model.MalattiaContagiosa;
 import epidemic.model.SegnalazioneContagi;
-import epidemic.model.Utente;
 import epidemic.model.DAO.MySqlDAOFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,7 +18,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Alert.AlertType;
@@ -44,6 +41,7 @@ public class ContrattoInterfaceController implements Initializable {
 	private MySqlDAOFactory database;
 	private ObservableList<String> listaComuniResponsabilita = FXCollections.observableArrayList();
 	private SpinnerValueFactory<Integer> svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0);
+	private HashSet<Spinner<Integer>> spinnerSet;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -60,7 +58,7 @@ public class ContrattoInterfaceController implements Initializable {
 		}
 	}
 
-	public void updateData() {
+	public void updateData() throws IOException {
 		String nomeComune = comboComune.getValue();
 		if(nomeComune == null || !comboComune.getItems().contains(nomeComune)) {
 			Alert alert = new Alert(AlertType.WARNING);
@@ -68,40 +66,60 @@ public class ContrattoInterfaceController implements Initializable {
 			alert.showAndWait();
 			return;
 		}
-		//temp
-		Date oggi = new Date(System.currentTimeMillis());
-		List<Contagio> contagi = new ArrayList<>();
-		SegnalazioneContagi nuovaSegnalazione;
 		
-		/*if(spinInfluenze.getValue() != 0)
-			contagi.add(newContagio())*/
-			
-		//prendi dagli spinner i dati e usali
-		//per creare la nuova segnalazione
+		Comune comuneRiferimento = database.getComuneDAO().getComuneDaNome(nomeComune);
+		Date dataOggi = new Date(System.currentTimeMillis());
+		List<Contagio> contagi = new ArrayList<>();
+		
+		fillContagi(contagi);
+		
+		
+		SegnalazioneContagi nuovaSegnalazione = new SegnalazioneContagi(contagi, dataOggi, comuneRiferimento);
 		
 		//aggiorna database
+		database.getSegnalazioneContagiDAO().create(nuovaSegnalazione);
+		
 		
 		//disable grid
 		gridMalattie.setDisable(true);
 		
 	}
 	
-	private void setupSpinners() {
-		spinInfluenze.setValueFactory(svf);
-		spinComplicazioni.setValueFactory(svf);
-		spinPolmoniti.setValueFactory(svf);
-		spinMeningiti.setValueFactory(svf);
-		spinEpatiti.setValueFactory(svf);
-		spinMorbillo.setValueFactory(svf);
-		spinTubercolosi.setValueFactory(svf);
-		spinGastroenteriti.setValueFactory(svf);
-		spinInfluenzeTI.setValueFactory(svf);
-		spinComplicazioniTI.setValueFactory(svf);
-		spinPolmonitiTI.setValueFactory(svf);
-		spinMeningitiTI.setValueFactory(svf);
-		spinEpatitiTI.setValueFactory(svf);
-		spinMorbilloTI.setValueFactory(svf);
-		spinTubercolosiTI.setValueFactory(svf);
-		spinGastroenteritiTI.setValueFactory(svf);	
+	private void fillContagi(List<Contagio> contagi) {
+		contagi.add(new Contagio(MalattiaContagiosa.INFLUENZA, spinInfluenze.getValue(), spinInfluenzeTI.getValue()));
+		contagi.add(new Contagio(MalattiaContagiosa.INFLUENZA_COMPLICAZIONI, spinComplicazioni.getValue(), spinComplicazioniTI.getValue()));
+		contagi.add(new Contagio(MalattiaContagiosa.EPATITE, spinEpatiti.getValue(), spinEpatitiTI.getValue()));
+		contagi.add(new Contagio(MalattiaContagiosa.MENINGITE, spinMeningiti.getValue(), spinMeningitiTI.getValue()));
+		contagi.add(new Contagio(MalattiaContagiosa.POLMONITE, spinPolmoniti.getValue(), spinPolmonitiTI.getValue()));
+		contagi.add(new Contagio(MalattiaContagiosa.MORBILLO, spinMorbillo.getValue(), spinMorbilloTI.getValue()));
+		contagi.add(new Contagio(MalattiaContagiosa.TUBERCOLOSI, spinTubercolosi.getValue(), spinTubercolosiTI.getValue()));
+		contagi.add(new Contagio(MalattiaContagiosa.GASTROENTERITE, spinGastroenteriti.getValue(), spinGastroenteritiTI.getValue()));
 	}
+	
+	private void setupSpinners() {
+		setSpinnerSet();
+		for(Spinner<Integer> sp: spinnerSet)
+			sp.setValueFactory(svf);
+	}
+	
+	private void setSpinnerSet() {
+		spinnerSet = new HashSet<>();
+		this.spinnerSet.add(spinInfluenze);
+		this.spinnerSet.add(spinComplicazioni);
+		this.spinnerSet.add(spinPolmoniti);
+		this.spinnerSet.add(spinMeningiti);
+		this.spinnerSet.add(spinEpatiti);
+		this.spinnerSet.add(spinMorbillo);
+		this.spinnerSet.add(spinTubercolosi);
+		this.spinnerSet.add(spinGastroenteriti);
+		this.spinnerSet.add(spinInfluenzeTI);
+		this.spinnerSet.add(spinComplicazioniTI);
+		this.spinnerSet.add(spinPolmonitiTI);
+		this.spinnerSet.add(spinMeningitiTI);
+		this.spinnerSet.add(spinEpatitiTI);
+		this.spinnerSet.add(spinMorbilloTI);
+		this.spinnerSet.add(spinTubercolosiTI);
+		this.spinnerSet.add(spinGastroenteritiTI);
+	}
+	
 }

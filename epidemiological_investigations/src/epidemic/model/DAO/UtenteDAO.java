@@ -193,6 +193,7 @@ public class UtenteDAO implements DAO<Utente>{
 
 	@Override
 	public int create(Utente utente) {
+		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -209,7 +210,7 @@ public class UtenteDAO implements DAO<Utente>{
             result = preparedStatement.getGeneratedKeys();
  
             if (result.next() && result != null) {
-                return result.getInt(1);
+                success = result.getInt(1);
             } else {
                 return -1;
             }
@@ -234,11 +235,12 @@ public class UtenteDAO implements DAO<Utente>{
             }
         }
  
-        return -1;
+        return success;
 	}
 
 	@Override
 	public boolean update(Utente utente) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -251,7 +253,7 @@ public class UtenteDAO implements DAO<Utente>{
             preparedStatement.setInt(5, utente.getRuolo().ordinal());
             preparedStatement.setInt(6, utente.getId());
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -266,11 +268,12 @@ public class UtenteDAO implements DAO<Utente>{
                 cse.printStackTrace();
             }
         }
-        return false;
+        return success;
 	}
 
 	@Override
 	public boolean delete(Utente utente) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -278,7 +281,7 @@ public class UtenteDAO implements DAO<Utente>{
             preparedStatement = connection.prepareStatement(DELETE_QUERY);
             preparedStatement.setInt(1, utente.getId());
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -293,7 +296,7 @@ public class UtenteDAO implements DAO<Utente>{
                 cse.printStackTrace();
             }
         }
-        return false;
+        return success;
 	}
 
 }

@@ -48,4 +48,8 @@ public class MySqlDAOFactory {
 		return ComuneDAO.getIstance();
 	}
 
+	public SegnalazioneContagiDAO getSegnalazioneContagiDAO() throws IOException {
+		return SegnalazioneContagiDAO.getIstance();
+	}
+
 }

@@ -114,6 +114,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
 
 	@Override
 	public int create(Provincia provincia) {
+		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -126,7 +127,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getGeneratedKeys();
             
             if (result.next() && result != null)
-                return result.getInt(1);
+                success = result.getInt(1);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -148,12 +149,13 @@ public class ProvinciaDAO implements DAO<Provincia>{
             }
         }
  
-        return -1;
+        return success;
 	}
 
 
 	@Override
 	public boolean update(Provincia provincia) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -161,7 +163,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromProvincia(preparedStatement, provincia);
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -176,11 +178,12 @@ public class ProvinciaDAO implements DAO<Provincia>{
                 cse.printStackTrace();
             }
         }
-        return false;
+        return success;
 	}
 
 	@Override
 	public boolean delete(Provincia provincia) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -188,7 +191,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
             preparedStatement.setInt(1, provincia.getId());
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -203,7 +206,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
                 cse.printStackTrace();
             }
         }
-		return false;
+		return success;
 	}
 
 	private void setPreparedStatementFromProvincia(PreparedStatement preparedStatement, Provincia provincia) throws SQLException {

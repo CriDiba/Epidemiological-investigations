@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class SegnalazioneContagi {
+	private int id;
 	private List<Contagio> contagi;
 	private Date data;
 	private Comune comuneRiferimento;
@@ -14,6 +15,14 @@ public class SegnalazioneContagi {
 		this.comuneRiferimento = comuneRiferimento;
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public List<Contagio> getContagi() {
 		return contagi;
 	}

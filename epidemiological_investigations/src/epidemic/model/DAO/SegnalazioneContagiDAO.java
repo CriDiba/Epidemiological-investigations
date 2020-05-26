@@ -10,30 +10,32 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import epidemic.model.Regione;
 
-public class RegioneDAO implements DAO<Regione> {
+import epidemic.model.Comune;
+import epidemic.model.Contagio;
+import epidemic.model.MalattiaContagiosa;
+import epidemic.model.SegnalazioneContagi;
 
-	private static RegioneDAO istance;
+public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
+	private static SegnalazioneContagiDAO istance;
 	private Properties queries;
 	
-	private RegioneDAO() throws IOException {
+	private SegnalazioneContagiDAO() throws IOException {
 		InputStream queryFile = null;
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("/queries/regioniQueries.properties");
+		queryFile = getClass().getResourceAsStream("/queries/segnalazioneContagiQueries.properties");
 		queries.load(queryFile);
 	}
 	
-	public static RegioneDAO getIstance() throws IOException {
+	public static SegnalazioneContagiDAO getIstance() throws IOException {
 		if(istance == null)
-			istance = new RegioneDAO();
+			istance = new SegnalazioneContagiDAO();
 		return istance;
 	}
 	
 	@Override
-	public List<Regione> getAll() {
-		List<Regione> regions = new ArrayList<>();
-		
+	public List<SegnalazioneContagi> getAll() {
+		List<SegnalazioneContagi> segnContagi = new ArrayList<>();
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -45,9 +47,9 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	regions.add(getRegioneFromRS(result));
+            	segnContagi.add(getSegnalazioneFromRS(result, connection));
            
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -67,12 +69,13 @@ public class RegioneDAO implements DAO<Regione> {
             }
         }
         
-        return regions;
+        return segnContagi;
 	}
 
+
 	@Override
-	public Regione get(int id) {
-		Regione regione = null;
+	public SegnalazioneContagi get(int id) {
+		SegnalazioneContagi segnContagi = null;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -85,9 +88,9 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	regione = getRegioneFromRS(result);
+            	segnContagi = getSegnalazioneFromRS(result, connection);
             
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -107,11 +110,11 @@ public class RegioneDAO implements DAO<Regione> {
             }
         }
  
-        return regione;
+        return segnContagi;
 	}
 
 	@Override
-	public int create(Regione regione) {
+	public int create(SegnalazioneContagi segnContagi) {
 		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -120,7 +123,7 @@ public class RegioneDAO implements DAO<Regione> {
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromRegione(preparedStatement, regione);           
+            setPreparedStatementFromSegnalazione(preparedStatement, segnContagi);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -151,14 +154,14 @@ public class RegioneDAO implements DAO<Regione> {
 	}
 
 	@Override
-	public boolean update(Regione regione) {
+	public boolean update(SegnalazioneContagi segnContagi) {
 		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromRegione(preparedStatement, regione);
+            setPreparedStatementFromSegnalazione(preparedStatement, segnContagi);
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -179,14 +182,14 @@ public class RegioneDAO implements DAO<Regione> {
 	}
 
 	@Override
-	public boolean delete(Regione regione) {
+	public boolean delete(SegnalazioneContagi segnContagi) {
 		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
-            preparedStatement.setInt(1, regione.getId());
+            preparedStatement.setInt(1, segnContagi.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -206,14 +209,27 @@ public class RegioneDAO implements DAO<Regione> {
 		return success;
 	}
 	
-	private void setPreparedStatementFromRegione(PreparedStatement preparedStatement, Regione regione) throws SQLException {
-		 preparedStatement.setString(1, regione.getNome());
-         preparedStatement.setDouble(2, regione.getSuperficie());
-         preparedStatement.setString(3, regione.getCapoluogo());
+	private void setPreparedStatementFromSegnalazione(PreparedStatement preparedStatement, SegnalazioneContagi segnContagi) {
+		// TODO Auto-generated method stub
+		
 	}
 	
-	private Regione getRegioneFromRS(ResultSet result) throws SQLException {
-		return new Regione(result.getInt("id"), result.getString("nome"), result.getDouble("superficie"), result.getString("capoluogo"));
+	private SegnalazioneContagi getSegnalazioneFromRS(ResultSet result, Connection connection) throws IOException, SQLException {
+		PreparedStatement getContagi = connection.prepareStatement(queries.getProperty("get_contagi_query"));
+		getContagi.setInt(1, result.getInt("id"));
+		getContagi.execute();
+		ResultSet contagi = getContagi.getResultSet();
+		
+		List<Contagio> listaContagi = new ArrayList<>();
+		while(contagi.next())
+			listaContagi.add(new Contagio(MalattiaContagiosa.values()[contagi.getInt("malattia")],
+					contagi.getInt("persone_ricoverate"),
+					contagi.getInt("persone_in_cura")));
+		
+		MySqlDAOFactory database = new MySqlDAOFactory();
+		Comune comune = database.getComuneDAO().get(result.getInt("id_comune"));
+		
+		return new SegnalazioneContagi(listaContagi, result.getDate("data"), comune);
 	}
 
 }
