@@ -14,6 +14,8 @@ import java.util.Properties;
 import epidemic.model.Comune;
 import epidemic.model.Provincia;
 import epidemic.model.Territorio;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 
 public class ComuneDAO implements DAO<Comune>{
@@ -34,8 +36,8 @@ public class ComuneDAO implements DAO<Comune>{
 		return istance;
 	}
 	
-	public Comune getComuneDaNome(String nomeComune) {
-		Comune comune = null;
+	public int getIdDaNome(String nomeComune) {
+		int idComune = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -47,8 +49,8 @@ public class ComuneDAO implements DAO<Comune>{
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
  
-            if (result.next() && result != null)
-            	comune = getComuneFromRS(result, connection);
+            if (result != null)
+            	idComune = result.getInt("id");
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -70,7 +72,46 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
  
-        return comune;
+        return idComune;
+	}
+	
+	public ObservableList<String> getNomeComuniPerResponsabile(int idUtenteContratto) {
+		ObservableList<String> nomiComuni = FXCollections.observableArrayList();
+		Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet result = null;
+        
+        try {
+        	connection = MySqlDAOFactory.createConnection();
+            preparedStatement = connection.prepareStatement(queries.getProperty("comuni_di_responsabilita_query"));
+            preparedStatement.setInt(1, idUtenteContratto);
+            preparedStatement.execute();
+            result = preparedStatement.getResultSet();
+ 
+            while (result.next())
+            	nomiComuni.add(result.getString("nome"));
+           
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                result.close();
+            } catch (Exception rse) {
+                rse.printStackTrace();
+            }
+            try {
+                preparedStatement.close();
+            } catch (Exception sse) {
+                sse.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (Exception cse) {
+                cse.printStackTrace();
+            }
+        }
+ 
+        return nomiComuni;
 	}
 	
 	@Override
@@ -266,8 +307,10 @@ public class ComuneDAO implements DAO<Comune>{
 		Provincia provincia = new Provincia(datiProvincia.getString("nome"), datiProvincia.getDouble("superficie"), datiProvincia.getString("capoluogo"), null);
 		
 		
-		return new Comune(result.getString("nome"), result.getDouble("superficie"), result.getString("istat"),
+		Comune comune = new Comune(result.getString("nome"), result.getDouble("superficie"), result.getString("istat"),
 				result.getDate("data_istituzione"), Territorio.values()[result.getInt("territorio")], result.getBoolean("mare"), provincia);
+		comune.setId(result.getInt("id"));
+		return comune;
 	}
 
 

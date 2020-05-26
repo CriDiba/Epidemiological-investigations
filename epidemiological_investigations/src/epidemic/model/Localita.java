@@ -35,7 +35,8 @@ public abstract class Localita {
 	}
 	
 	public void setSuperficie(float superficie) {
-		this.superficie = superficie;
+		if(superficie >= 0)
+			this.superficie = superficie;
 	}
 	
 	public double getSuperficie() {

@@ -21,7 +21,7 @@
    <center>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
-            <GridPane fx:id="gridMalattie" alignment="CENTER_RIGHT" disable="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="313.0" prefWidth="590.0">
+            <GridPane fx:id="gridMalattie" alignment="CENTER_RIGHT" nodeOrientation="LEFT_TO_RIGHT" prefHeight="313.0" prefWidth="590.0">
               <columnConstraints>
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -46,38 +46,38 @@
                   <Label prefHeight="18.0" prefWidth="264.0" text="Morbillo" GridPane.rowIndex="6" />
                   <Label prefHeight="18.0" prefWidth="264.0" text="Tubercolosi" GridPane.rowIndex="7" />
                   <Label prefHeight="18.0" prefWidth="264.0" text="Gastroenteriti" GridPane.rowIndex="8" />
-                  <Spinner fx:id="spinInfluenze" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Spinner fx:id="spinPolmoniti" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <Spinner fx:id="spinMeningiti" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <Spinner fx:id="spinEpatiti" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <Spinner fx:id="spinMorbillo" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <Spinner fx:id="spinTubercolosi" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                  <Spinner fx:id="spinGastroenteriti" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Malattia" wrappingWidth="143.7366943359375">
+                  <Spinner fx:id="spinInfluenze" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Spinner fx:id="spinPolmoniti" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Spinner fx:id="spinMeningiti" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Spinner fx:id="spinEpatiti" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <Spinner fx:id="spinMorbillo" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <Spinner fx:id="spinTubercolosi" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <Spinner fx:id="spinGastroenteriti" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Malattia" textAlignment="CENTER" wrappingWidth="143.7366943359375">
                      <font>
                         <Font name="Calibri" size="27.0" />
                      </font>
                   </Text>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Casi" wrappingWidth="143.7366943359375" GridPane.columnIndex="1">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Presso medico di base" textAlignment="CENTER" wrappingWidth="189.33673095703125" GridPane.columnIndex="1">
                      <font>
-                        <Font name="Calibri" size="26.0" />
+                        <Font name="Calibri" size="21.0" />
                      </font>
                   </Text>
-                  <Label fx:id="lblInfluenze" text="0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                  <Label fx:id="lblPolmoniti" text="0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                  <Label fx:id="lblMeningiti" text="0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                  <Label fx:id="lblEpatiti" text="0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                  <Label fx:id="lblMorbillo" text="0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                  <Label fx:id="lblTubercolosi" text="0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                  <Label fx:id="lblGastroenteriti" text="0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Casi precedenti" wrappingWidth="163.7366943359375" GridPane.columnIndex="2">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="In terapia intensiva" textAlignment="CENTER" wrappingWidth="193.336669921875" GridPane.columnIndex="2">
                      <font>
-                        <Font name="Calibri" size="26.0" />
+                        <Font name="Calibri" size="21.0" />
                      </font>
                   </Text>
                   <Label prefHeight="18.0" prefWidth="264.0" text="Influenza e complicazioni respiratorie" GridPane.rowIndex="2" />
-                  <Spinner fx:id="spinComplicazioni" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Label fx:id="lblComplicazioni" text="0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Spinner fx:id="spinComplicazioni" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Spinner fx:id="spinInfluenzeTI" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Spinner fx:id="spinComplicazioniTI" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Spinner fx:id="spinPolmonitiTI" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <Spinner fx:id="spinMeningitiTI" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                  <Spinner fx:id="spinEpatitiTI" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                  <Spinner fx:id="spinMorbilloTI" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                  <Spinner fx:id="spinTubercolosiTI" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                  <Spinner fx:id="spinGastroenteritiTI" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                </children>
             </GridPane>
          </children>
@@ -108,8 +108,6 @@
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
             <ComboBox fx:id="comboComune" editable="true" prefHeight="26.0" prefWidth="170.0" promptText="Comune" />
-            <ComboBox fx:id="comboStatoPazienti" editable="true" prefHeight="26.0" prefWidth="170.0" promptText="Stato pazienti" />
-            <Button mnemonicParsing="false" onAction="#loadCases" text="Carica" />
          </children>
       </HBox>
    </top>

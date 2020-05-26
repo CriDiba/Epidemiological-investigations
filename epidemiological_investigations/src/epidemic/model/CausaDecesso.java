@@ -1,0 +1,8 @@
+package epidemic.model;
+
+public enum CausaDecesso {
+	INCIDENTE_STRADALE,
+	MALATTIA_TUMORALE,
+	MALATTIA_CARDIOVASCOLARE,
+	MALATTIA_CONTAGIOSA;
+}

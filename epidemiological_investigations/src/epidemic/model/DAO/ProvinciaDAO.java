@@ -219,8 +219,10 @@ public class ProvinciaDAO implements DAO<Provincia>{
 		getRegione.execute();
 		ResultSet regione = getRegione.getResultSet();
 		
-		return new Provincia(result.getString("nome"), result.getDouble("superficie"), 
+		Provincia provincia =  new Provincia(result.getString("nome"), result.getDouble("superficie"), 
     			result.getString("capoluogo"), new Regione(regione.getString("nome"), regione.getDouble("superficie"),
     					regione.getString("capoluogo")));
+		provincia.setId(result.getInt("id"));
+		return provincia;
 	}
 }

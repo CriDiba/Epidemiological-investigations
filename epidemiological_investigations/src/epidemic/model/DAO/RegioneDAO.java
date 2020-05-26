@@ -45,7 +45,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	regions.add(new Regione(result.getString(1), result.getDouble(2), result.getString(3)));
+	           	regions.add(getRegioneFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,7 +85,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	regione = new Regione(result.getString(1), result.getDouble(2), result.getString(3));
+            	regione = getRegioneFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -207,6 +207,10 @@ public class RegioneDAO implements DAO<Regione> {
 		 preparedStatement.setString(1, regione.getNome());
          preparedStatement.setDouble(2, regione.getSuperficie());
          preparedStatement.setString(3, regione.getCapoluogo());
+	}
+	
+	private Regione getRegioneFromRS(ResultSet result) throws SQLException {
+		return new Regione(result.getInt("id"), result.getString("nome"), result.getDouble("superficie"), result.getString("capoluogo"));
 	}
 
 }

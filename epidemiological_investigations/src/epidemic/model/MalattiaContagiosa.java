@@ -1,0 +1,12 @@
+package epidemic.model;
+
+public enum MalattiaContagiosa {
+	INFLUENZA,
+	INFLUENZA_COMPLICAZIONI,
+	POLMONITE,
+	MENINGITE,
+	EPATITE,
+	MORBILLO,
+	TUBERCOLOSI,
+	GASTROENTERITE;
+}

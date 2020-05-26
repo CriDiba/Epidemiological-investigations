@@ -10,7 +10,7 @@ public class Comune extends Localita {
 	private final boolean sulMare;
 	private final Provincia provinciaAppartenenza;
 	private Contratto responsabile;
-	private List<Segnalazione> segnalazioniContagi;
+	private List<SegnalazioneContagi> segnalazioniContagi;
 	
 	public Comune(String nome, double superficie, String istat, Date dataIstituzione, Territorio territorio, boolean sulMare, Provincia provinciaAppartenenza) {
 		super(nome, superficie);
@@ -27,11 +27,11 @@ public class Comune extends Localita {
 	}
 	
 	
-	public List<Segnalazione> getSegnalazioniContagi() {
+	public List<SegnalazioneContagi> getSegnalazioniContagi() {
 		return segnalazioniContagi;
 	}
 
-	public void setSegnalazioniContagi(List<Segnalazione> segnalazioniContagi) {
+	public void setSegnalazioniContagi(List<SegnalazioneContagi> segnalazioniContagi) {
 		this.segnalazioniContagi = segnalazioniContagi;
 	}
 

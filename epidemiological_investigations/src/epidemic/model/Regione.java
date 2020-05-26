@@ -10,6 +10,11 @@ public class Regione extends Localita{
 		this.capoluogo = capoluogo;
 	}
 	
+	public Regione(int id, String nome, double superficie, String capoluogo) {
+		this(nome, superficie, capoluogo);
+		setId(id);
+	}
+	
 	public String getCapoluogo() {
 		return capoluogo;
 	}
