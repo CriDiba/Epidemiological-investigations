@@ -34,7 +34,7 @@ public abstract class Localita {
 		return nome;
 	}
 	
-	public void setSuperficie(float superficie) {
+	public void setSuperficie(double superficie) {
 		this.superficie = superficie;
 	}
 	
