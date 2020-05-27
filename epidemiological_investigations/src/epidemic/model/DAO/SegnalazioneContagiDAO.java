@@ -13,7 +13,6 @@ import java.util.Properties;
 
 import epidemic.model.Comune;
 import epidemic.model.Contagio;
-import epidemic.model.MalattiaContagiosa;
 import epidemic.model.SegnalazioneContagi;
 
 public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
@@ -130,6 +129,8 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             if (result.next() && result != null)
                 success = result.getInt(1);
             
+            createContagiPerSegnalazione(segnContagi, success);
+            
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -162,6 +163,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromSegnalazione(preparedStatement, segnContagi);
+            preparedStatement.setInt(3, segnContagi.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -189,7 +191,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
-            preparedStatement.setInt(3, segnContagi.getId());
+            preparedStatement.setInt(1, segnContagi.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -219,7 +221,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 		List<Contagio> listaContagi = new ArrayList<>();
 		Comune comune = null;
 		try {
-			listaContagi = database.getContagioDAO().getAll();			
+			listaContagi = database.getContagioDAO().getAllForSegnalazione(result.getInt("id"));			
 			comune = database.getComuneDAO().get(result.getInt("id_comune"));
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -227,6 +229,26 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 		}
 		
 		return new SegnalazioneContagi(listaContagi, result.getDate("data"), comune);
+	}
+	
+	private void createContagiPerSegnalazione(SegnalazioneContagi segnContagi, int success) {
+		MySqlDAOFactory database = new MySqlDAOFactory();
+		ContagioDAO contagioDAO;
+		
+		try {
+			contagioDAO = database.getContagioDAO();
+		} catch(IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+        segnContagi.setId(success);
+        
+        for(Contagio contagio: segnContagi.getContagi()) {
+        	contagio.setSegnalazione(segnContagi);
+        	contagioDAO.create(contagio);
+        }
+		
 	}
 
 }
