@@ -45,7 +45,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	regions.add(new Regione(result.getString(1), result.getDouble(2), result.getString(3)));
+	           	regions.add(getRegioneFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,7 +85,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	regione = new Regione(result.getString(1), result.getDouble(2), result.getString(3));
+            	regione = getRegioneFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -112,6 +112,7 @@ public class RegioneDAO implements DAO<Regione> {
 
 	@Override
 	public int create(Regione regione) {
+		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -124,7 +125,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getGeneratedKeys();
             
             if (result.next() && result != null)
-                return result.getInt(1);
+                success = result.getInt(1);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -146,19 +147,21 @@ public class RegioneDAO implements DAO<Regione> {
             }
         }
  
-        return -1;
+        return success;
 	}
 
 	@Override
 	public boolean update(Regione regione) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromRegione(preparedStatement, regione);
+            preparedStatement.setInt(4, regione.getId());
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -173,11 +176,12 @@ public class RegioneDAO implements DAO<Regione> {
                 cse.printStackTrace();
             }
         }
-        return false;
+        return success;
 	}
 
 	@Override
 	public boolean delete(Regione regione) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -185,7 +189,7 @@ public class RegioneDAO implements DAO<Regione> {
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
             preparedStatement.setInt(1, regione.getId());
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -200,13 +204,17 @@ public class RegioneDAO implements DAO<Regione> {
                 cse.printStackTrace();
             }
         }
-		return false;
+		return success;
 	}
 	
 	private void setPreparedStatementFromRegione(PreparedStatement preparedStatement, Regione regione) throws SQLException {
 		 preparedStatement.setString(1, regione.getNome());
          preparedStatement.setDouble(2, regione.getSuperficie());
          preparedStatement.setString(3, regione.getCapoluogo());
+	}
+	
+	private Regione getRegioneFromRS(ResultSet result) throws SQLException {
+		return new Regione(result.getInt("id"), result.getString("nome"), result.getDouble("superficie"), result.getString("capoluogo"));
 	}
 
 }

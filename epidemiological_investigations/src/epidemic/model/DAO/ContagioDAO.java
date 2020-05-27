@@ -11,47 +11,43 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import epidemic.model.Comune;
-import epidemic.model.Provincia;
-import epidemic.model.Territorio;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import epidemic.model.Contagio;
+import epidemic.model.MalattiaContagiosa;
+import epidemic.model.SegnalazioneContagi;
 
-
-public class ComuneDAO implements DAO<Comune>{
-	
-	private static ComuneDAO istance;
+public class ContagioDAO implements DAO<Contagio>{
+	private static ContagioDAO istance;
 	private Properties queries;
 	
-	private ComuneDAO() throws IOException {
+	private ContagioDAO() throws IOException {
 		InputStream queryFile = null;
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("/queries/comuniQueries.properties");
+		queryFile = getClass().getResourceAsStream("/queries/contagioQueries.properties");
 		queries.load(queryFile);
 	}
 	
-	public static ComuneDAO getIstance() throws IOException {
+	public static ContagioDAO getIstance() throws IOException {
 		if(istance == null)
-			istance = new ComuneDAO();
+			istance = new ContagioDAO();
 		return istance;
 	}
 	
-	public Comune getComuneDaNome(String nomeComune) {
-		Comune comune = null;
+	public List<Contagio> getAllForSegnalazione(int id_segnalazione) {
+		List<Contagio> contagi = new ArrayList<>();
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
         
         try {
         	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(queries.getProperty("nome_query"));
-            preparedStatement.setString(1, nomeComune);
+            preparedStatement = connection.prepareStatement(queries.getProperty("read_per_segnalazione_query"));
+            preparedStatement.setInt(1, id_segnalazione);
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
- 
-            if (result != null)
-            	comune = getComuneFromRS(result);
-           
+            
+            while(result.next())
+            	contagi.add(getContagioFromRS(result));
+            
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -72,52 +68,12 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
  
-        return comune;
+        return contagi;
 	}
-	
-	public ObservableList<String> getNomeComuniPerResponsabile(int idUtenteContratto) {
-		ObservableList<String> nomiComuni = FXCollections.observableArrayList();
-		Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet result = null;
-        
-        try {
-        	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(queries.getProperty("comuni_di_responsabilita_query"));
-            preparedStatement.setInt(1, idUtenteContratto);
-            preparedStatement.execute();
-            result = preparedStatement.getResultSet();
- 
-            while (result.next())
-            	nomiComuni.add(result.getString("nome"));
-           
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                result.close();
-            } catch (Exception rse) {
-                rse.printStackTrace();
-            }
-            try {
-                preparedStatement.close();
-            } catch (Exception sse) {
-                sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
-        }
- 
-        return nomiComuni;
-	}
-	
+
 	@Override
-	public List<Comune> getAll() {
-		List<Comune> municipalities = new ArrayList<>();
-		
+	public List<Contagio> getAll() {
+		List<Contagio> contagi = new ArrayList<>();
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -129,7 +85,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-            	municipalities.add(getComuneFromRS(result));
+            	contagi.add(getContagioFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -151,12 +107,12 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
         
-        return municipalities;
+        return contagi;
 	}
 
 	@Override
-	public Comune get(int id) {
-		Comune comune = null;
+	public Contagio get(int id) {
+		Contagio contagio = null;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -169,7 +125,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	comune = getComuneFromRS(result);
+            	contagio = getContagioFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -191,11 +147,11 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
  
-        return comune;
+        return contagio;
 	}
 
 	@Override
-	public int create(Comune comune) {
+	public int create(Contagio contagio) {
 		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -204,7 +160,7 @@ public class ComuneDAO implements DAO<Comune>{
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromComune(preparedStatement, comune);
+            setPreparedStatementFromContagio(preparedStatement, contagio);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -234,16 +190,17 @@ public class ComuneDAO implements DAO<Comune>{
         return success;
 	}
 
+
 	@Override
-	public boolean update(Comune comune) {
+	public boolean update(Contagio contagio) {
 		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromComune(preparedStatement, comune);
-            preparedStatement.setInt(8, comune.getId());
+            setPreparedStatementFromContagio(preparedStatement, contagio);
+            preparedStatement.setInt(4, contagio.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -264,14 +221,14 @@ public class ComuneDAO implements DAO<Comune>{
 	}
 
 	@Override
-	public boolean delete(Comune comune) {
+	public boolean delete(Contagio contagio) {
 		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
-            preparedStatement.setInt(1, comune.getId());
+            preparedStatement.setInt(1, contagio.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -290,37 +247,33 @@ public class ComuneDAO implements DAO<Comune>{
         }
 		return success;
 	}
-	
-	private void setPreparedStatementFromComune(PreparedStatement preparedStatement, Comune comune) throws SQLException {
-		preparedStatement.setString(1, comune.getNome());
-        preparedStatement.setDouble(2, comune.getSuperficie());
-        preparedStatement.setString(3, comune.getIstat());
-		preparedStatement.setDate(4, comune.getDataIstituzione());
-		preparedStatement.setInt(5, comune.getTerritorio().ordinal());
-		preparedStatement.setBoolean(6, comune.getSulMare());
-		preparedStatement.setString(7, comune.getProvinciaAppartenenza().getNome());
-		
+
+
+	private void setPreparedStatementFromContagio(PreparedStatement preparedStatement, Contagio contagio) throws SQLException {
+		preparedStatement.setInt(1, contagio.getMalattia().ordinal());
+		preparedStatement.setInt(2, contagio.getPersoneRicoverate());
+		preparedStatement.setInt(3, contagio.getPersoneInCura());
 	}
 	
-	private Comune getComuneFromRS(ResultSet result) throws SQLException {
+	private Contagio getContagioFromRS(ResultSet result) throws SQLException {
+		
 		MySqlDAOFactory database = new MySqlDAOFactory();
-		Provincia provincia;
+		SegnalazioneContagi segnalazione = null;
 		
 		try {
-			provincia = database.getProvinciaDAO().get(result.getInt("id_provincia"));
+			segnalazione = database.getSegnalazioneContagiDAO().get(result.getInt("id_segnalazione"));
 		} catch(IOException e) {
 			e.printStackTrace();
 			return null;
-		}		
+		}
 		
-		Comune comune = new Comune(result.getString("nome"), result.getDouble("superficie"), result.getString("istat"),
-				result.getDate("data_istituzione"), Territorio.values()[result.getInt("territorio")], result.getBoolean("mare"), provincia);
-		comune.setId(result.getInt("id"));
-		return comune;
+		Contagio contagio = new Contagio(MalattiaContagiosa.values()[result.getInt("malattia")],
+							result.getInt("persone_ricoverate"), result.getInt("persone_in_cura"));
+		
+		contagio.setSegnalazione(segnalazione);
+		contagio.setId(result.getInt("id"));
+		return contagio;
 	}
 
-
+	
 }
-
-
-

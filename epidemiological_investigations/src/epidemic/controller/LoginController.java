@@ -24,6 +24,8 @@ public class LoginController {
 	@FXML
 	private PasswordField password;
 	
+	private static int idUtente;
+	
 	public void setMainReference(MainClass mainReference) {
 		this.mainReference = mainReference;
 	}
@@ -31,7 +33,6 @@ public class LoginController {
 	
 	@FXML
 	public void handleLogin(ActionEvent e) throws IOException {
-		//pwd.clear();
 		
 		MySqlDAOFactory database = new MySqlDAOFactory();
 
@@ -49,7 +50,7 @@ public class LoginController {
 		    		//autorizzatoInterface();
 		    		break;
 		    	case CONTRATTO:
-		    		//contrattoInterface();
+		    		contrattoInterface(utente.getId());
 		    		break;
 			}
     	}
@@ -79,5 +80,17 @@ public class LoginController {
 		loader.setLocation(MainClass.class.getResource("/epidemic/view/AdminInterface.fxml"));
 		Scene scene = new Scene(loader.load());
 		mainReference.getPrimaryStage().setScene(scene);
+	}
+	
+	private void contrattoInterface(int idUtenteContratto) throws IOException{
+		idUtente = idUtenteContratto;
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(MainClass.class.getResource("/epidemic/view/ContrattoInterface.fxml"));
+		Scene scene = new Scene(loader.load());
+		mainReference.getPrimaryStage().setScene(scene);
+	}
+	
+	public static int getIdSession() {
+		return idUtente;
 	}
 }

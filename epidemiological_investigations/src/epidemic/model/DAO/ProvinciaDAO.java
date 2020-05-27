@@ -47,8 +47,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	provinces.add(new Provincia(result.getString("nome"), result.getDouble("superficie"), 
-            			result.getString("capoluogo"), result.get..));
+	           	provinces.add(getProvinciaFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -88,8 +87,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	provincia = new Provincia(result.getString("nome"), result.getDouble("superficie"), 
-            			result.getString("capoluogo"), result.get..);
+            	provincia = getProvinciaFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -116,6 +114,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
 
 	@Override
 	public int create(Provincia provincia) {
+		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -128,7 +127,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getGeneratedKeys();
             
             if (result.next() && result != null)
-                return result.getInt(1);
+                success = result.getInt(1);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -150,20 +149,22 @@ public class ProvinciaDAO implements DAO<Provincia>{
             }
         }
  
-        return -1;
+        return success;
 	}
 
 
 	@Override
 	public boolean update(Provincia provincia) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromProvincia(preparedStatement, provincia);
+            preparedStatement.setInt(5, provincia.getId());
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -178,11 +179,12 @@ public class ProvinciaDAO implements DAO<Provincia>{
                 cse.printStackTrace();
             }
         }
-        return false;
+        return success;
 	}
 
 	@Override
 	public boolean delete(Provincia provincia) {
+		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -190,7 +192,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
             preparedStatement.setInt(1, provincia.getId());
             preparedStatement.execute();
-            return true;
+            success = true;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -205,7 +207,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
                 cse.printStackTrace();
             }
         }
-		return false;
+		return success;
 	}
 
 	private void setPreparedStatementFromProvincia(PreparedStatement preparedStatement, Provincia provincia) throws SQLException {
@@ -213,5 +215,21 @@ public class ProvinciaDAO implements DAO<Provincia>{
         preparedStatement.setDouble(2, provincia.getSuperficie());
         preparedStatement.setString(3, provincia.getCapoluogo());
         preparedStatement.setString(4, provincia.getRegioneAppartenenza().getNome());
+	}
+	
+	private Provincia getProvinciaFromRS(ResultSet result) throws SQLException {
+		MySqlDAOFactory database = new MySqlDAOFactory();
+		Regione regione = null;
+		try {
+			regione = database.getRegioneDAO().get(result.getInt("id_regione"));
+		} catch(IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		Provincia provincia =  new Provincia(result.getString("nome"), result.getDouble("superficie"), 
+    			result.getString("capoluogo"), regione);
+		provincia.setId(result.getInt("id"));
+		return provincia;
 	}
 }

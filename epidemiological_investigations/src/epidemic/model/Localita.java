@@ -1,3 +1,4 @@
+
 package epidemic.model;
 
 public abstract class Localita {
@@ -34,8 +35,9 @@ public abstract class Localita {
 		return nome;
 	}
 	
-	public void setSuperficie(double superficie) {
-		this.superficie = superficie;
+	public void setSuperficie(float superficie) {
+		if(superficie >= 0)
+			this.superficie = superficie;
 	}
 	
 	public double getSuperficie() {
