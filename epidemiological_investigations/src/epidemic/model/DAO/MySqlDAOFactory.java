@@ -32,8 +32,8 @@ public class MySqlDAOFactory {
     
     
 
-	public UtenteDAO getUtenteDAO() {
-		return new UtenteDAO();
+	public UtenteDAO getUtenteDAO() throws IOException {
+		return UtenteDAO.getIstance();
 	}
 	
 	public RegioneDAO getRegioneDAO() throws IOException {

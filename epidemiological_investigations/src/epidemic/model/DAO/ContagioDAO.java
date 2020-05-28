@@ -1,5 +1,6 @@
 package epidemic.model.DAO;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -20,9 +21,8 @@ public class ContagioDAO implements DAO<Contagio>{
 	private Properties queries;
 	
 	private ContagioDAO() throws IOException {
-		InputStream queryFile = null;
+		InputStream queryFile = new FileInputStream("queries/contagioQueries.properties");
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("/queries/contagioQueries.properties");
 		queries.load(queryFile);
 	}
 	

@@ -1,5 +1,6 @@
 package epidemic.model.DAO;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -20,9 +21,8 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 	private Properties queries;
 	
 	private SegnalazioneContagiDAO() throws IOException {
-		InputStream queryFile = null;
+		InputStream queryFile = new FileInputStream("queries/segnalazioneContagiQueries.properties");
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("/queries/segnalazioneContagiQueries.properties");
 		queries.load(queryFile);
 	}
 	

@@ -1,5 +1,8 @@
 package epidemic.model.DAO;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,22 +10,25 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 import epidemic.model.*;
 
 public class UtenteDAO implements DAO<Utente>{
+	private static UtenteDAO istance;
+	private Properties queries;
 	
-	private static final String READ_ALL_QUERY = "SELECT * FROM utenti";
+	private UtenteDAO() throws IOException {
+		InputStream queryFile = new FileInputStream("queries/utentiQueries.properties");
+		queries = new Properties();
+		queries.load(queryFile);
+	}
 	
-	private static final String READ_QUERY = "SELECT * FROM utenti WHERE id = ?";
-	
-	private static final String CREATE_QUERY = "INSERT INTO utenti (nome, cognome, username, password, ruolo) VALUES (?,?,?,?,?)";
-
-    private static final String UPDATE_QUERY = "UPDATE utenti SET nome=?, cognome=?, username=?, password=?, ruolo=? WHERE id = ?";
-
-    private static final String DELETE_QUERY = "DELETE FROM utenti WHERE id = ?";
-    
-    private static final String USERNAME = "SELECT * FROM utenti WHERE username = ?";
-    
+	public static UtenteDAO getIstance() throws IOException {
+		if(istance == null)
+			istance = new UtenteDAO();
+		return istance;
+	}
     
     public Utente getUsername(String username) {
 		Utente utente = null;
@@ -32,7 +38,7 @@ public class UtenteDAO implements DAO<Utente>{
         
         try {
         	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(USERNAME);
+            preparedStatement = connection.prepareStatement(queries.getProperty("username_query"));
             preparedStatement.setString(1, username);
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
@@ -89,7 +95,7 @@ public class UtenteDAO implements DAO<Utente>{
         
         try {
         	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(READ_ALL_QUERY);
+            preparedStatement = connection.prepareStatement(queries.getProperty("read_all_query"));
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
  
@@ -146,7 +152,7 @@ public class UtenteDAO implements DAO<Utente>{
         
         try {
         	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(READ_QUERY);
+            preparedStatement = connection.prepareStatement(queries.getProperty("read_query"));
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
@@ -200,7 +206,7 @@ public class UtenteDAO implements DAO<Utente>{
         
         try {
             connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(CREATE_QUERY, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, utente.getNome());
             preparedStatement.setString(2, utente.getCognome());
             preparedStatement.setString(3, utente.getUsername());
@@ -245,7 +251,7 @@ public class UtenteDAO implements DAO<Utente>{
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(UPDATE_QUERY);
+            preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             preparedStatement.setString(1, utente.getNome());
             preparedStatement.setString(2, utente.getCognome());
             preparedStatement.setString(3, utente.getUsername());
@@ -278,7 +284,7 @@ public class UtenteDAO implements DAO<Utente>{
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(DELETE_QUERY);
+            preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
             preparedStatement.setInt(1, utente.getId());
             preparedStatement.execute();
             success = true;

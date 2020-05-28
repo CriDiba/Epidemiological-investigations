@@ -1,5 +1,6 @@
 package epidemic.model.DAO;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -18,9 +19,8 @@ public class RegioneDAO implements DAO<Regione> {
 	private Properties queries;
 	
 	private RegioneDAO() throws IOException {
-		InputStream queryFile = null;
+		InputStream queryFile = new FileInputStream("queries/regioniQueries.properties");
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("/queries/regioniQueries.properties");
 		queries.load(queryFile);
 	}
 	

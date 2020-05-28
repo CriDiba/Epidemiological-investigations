@@ -1,5 +1,6 @@
 package epidemic.controller;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URL;
@@ -65,7 +66,12 @@ public class AdminInterfaceController implements Initializable {
     	comboRuolo.getItems().addAll(Ruolo.values());
     	
     	database = new MySqlDAOFactory();
-    	List<Utente> utenti = database.getUtenteDAO().getAll();
+    	List<Utente> utenti = null;
+		try {
+			utenti = database.getUtenteDAO().getAll();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     	listaUtenti.addAll(utenti);
     	
     	tableView.setItems(listaUtenti);
@@ -73,8 +79,9 @@ public class AdminInterfaceController implements Initializable {
 	
 	/**
 	 * handles the click on Add button
+	 * @throws IOException 
 	 */
-	public void handleAddUser() {
+	public void handleAddUser() throws IOException {
 		DAO<Utente> utenteDAO = database.getUtenteDAO();
 		
 		if(inputIsValid()) {
@@ -134,8 +141,9 @@ public class AdminInterfaceController implements Initializable {
 	
 	/**
 	 * delete selected rows of the table
+	 * @throws IOException 
 	 */
-	public void handleDeleteSelected() {
+	public void handleDeleteSelected() throws IOException {
 		Utente utente = tableView.getSelectionModel().getSelectedItem();
         if (utente != null) {
     		database.getUtenteDAO().delete(utente);
@@ -153,7 +161,7 @@ public class AdminInterfaceController implements Initializable {
 	}
 	
 	
-	public void handleEditUser() {
+	public void handleEditUser() throws IOException {
 
 		Utente utente = tableView.getSelectionModel().getSelectedItem();
 

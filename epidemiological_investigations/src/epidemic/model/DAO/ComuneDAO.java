@@ -1,5 +1,6 @@
 package epidemic.model.DAO;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -24,9 +25,8 @@ public class ComuneDAO implements DAO<Comune>{
 	private Properties queries;
 	
 	private ComuneDAO() throws IOException {
-		InputStream queryFile = null;
+		InputStream queryFile = new FileInputStream("queries/comuniQueries.properties");
 		queries = new Properties();
-		queryFile = getClass().getResourceAsStream("/queries/comuniQueries.properties");
 		queries.load(queryFile);
 	}
 	
