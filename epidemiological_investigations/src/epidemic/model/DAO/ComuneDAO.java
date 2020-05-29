@@ -49,7 +49,7 @@ public class ComuneDAO implements DAO<Comune>{
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
  
-            if (result != null)
+            if (result != null && result.next())
             	comune = getComuneFromRS(result);
            
         } catch (SQLException e) {
@@ -243,7 +243,7 @@ public class ComuneDAO implements DAO<Comune>{
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromComune(preparedStatement, comune);
-            preparedStatement.setInt(8, comune.getId());
+            preparedStatement.setInt(9, comune.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -298,8 +298,8 @@ public class ComuneDAO implements DAO<Comune>{
 		preparedStatement.setDate(4, comune.getDataIstituzione());
 		preparedStatement.setInt(5, comune.getTerritorio().ordinal());
 		preparedStatement.setBoolean(6, comune.getSulMare());
-		preparedStatement.setString(7, comune.getProvinciaAppartenenza().getNome());
-		
+		preparedStatement.setInt(7, comune.getProvinciaAppartenenza().getId());
+		preparedStatement.setInt(8, comune.getResponsabile().getId());
 	}
 	
 	private Comune getComuneFromRS(ResultSet result) throws SQLException {
@@ -311,11 +311,13 @@ public class ComuneDAO implements DAO<Comune>{
 		} catch(IOException e) {
 			e.printStackTrace();
 			return null;
-		}		
+		}
 		
+
 		Comune comune = new Comune(result.getString("nome"), result.getDouble("superficie"), result.getString("istat"),
 				result.getDate("data_istituzione"), Territorio.values()[result.getInt("territorio")], result.getBoolean("mare"), provincia);
 		comune.setId(result.getInt("id"));
+		
 		return comune;
 	}
 

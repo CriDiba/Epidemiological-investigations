@@ -126,10 +126,10 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
-            if (result.next() && result != null)
+            if (result.next() && result != null) {
                 success = result.getInt(1);
-            
-            createContagiPerSegnalazione(segnContagi, success);
+                createContagiPerSegnalazione(segnContagi, success);
+            }
             
         } catch (SQLException e) {
             e.printStackTrace();

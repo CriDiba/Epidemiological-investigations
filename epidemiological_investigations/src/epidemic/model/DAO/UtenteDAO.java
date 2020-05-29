@@ -215,11 +215,8 @@ public class UtenteDAO implements DAO<Utente>{
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
  
-            if (result.next() && result != null) {
+            if (result.next() && result != null) 
                 success = result.getInt(1);
-            } else {
-                return -1;
-            }
             
         } catch (SQLException e) {
             e.printStackTrace();

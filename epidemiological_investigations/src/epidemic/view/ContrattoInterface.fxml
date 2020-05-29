@@ -107,7 +107,7 @@
    <top>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
-            <ComboBox fx:id="comboComune" editable="true" prefHeight="26.0" prefWidth="170.0" promptText="Comune" />
+            <ComboBox fx:id="comboComune" editable="true" onAction="#enableGrid" prefHeight="26.0" prefWidth="170.0" promptText="Comune" />
          </children>
       </HBox>
    </top>

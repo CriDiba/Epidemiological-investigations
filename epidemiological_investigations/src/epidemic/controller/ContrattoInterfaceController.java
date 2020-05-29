@@ -40,12 +40,13 @@ public class ContrattoInterfaceController implements Initializable {
 	
 	private MySqlDAOFactory database;
 	private ObservableList<String> listaComuniResponsabilita = FXCollections.observableArrayList();
-	private SpinnerValueFactory<Integer> svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0);
+	//private SpinnerValueFactory<Integer> svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0);
 	private HashSet<Spinner<Integer>> spinnerSet;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		setupSpinners();
+		gridMalattie.setDisable(true);
 		database = new MySqlDAOFactory();
 		try {
 			listaComuniResponsabilita = database.getComuneDAO().getNomeComuniPerResponsabile(LoginController.getIdSession());
@@ -56,6 +57,10 @@ public class ContrattoInterfaceController implements Initializable {
 			alert.showAndWait();
 			e.printStackTrace();
 		}
+	}
+	
+	public void enableGrid() {
+		gridMalattie.setDisable(false);
 	}
 
 	public void updateData() throws IOException {
@@ -68,6 +73,10 @@ public class ContrattoInterfaceController implements Initializable {
 		}
 		
 		Comune comuneRiferimento = database.getComuneDAO().getComuneDaNome(nomeComune);
+		if(comuneRiferimento == null) {
+			System.out.println("somethings wrong here");
+			return;
+		}
 		Date dataOggi = new Date(System.currentTimeMillis());
 		List<Contagio> contagi = new ArrayList<>();
 		
@@ -80,9 +89,11 @@ public class ContrattoInterfaceController implements Initializable {
 		database.getSegnalazioneContagiDAO().create(nuovaSegnalazione);
 		
 		
-		//disable grid
+		//clear and disable grid
+		for(Spinner<Integer> sp: spinnerSet)
+			sp.getValueFactory().setValue(0);
+		comboComune.getSelectionModel().clearSelection();
 		gridMalattie.setDisable(true);
-		
 	}
 	
 	private void fillContagi(List<Contagio> contagi) {
@@ -99,7 +110,7 @@ public class ContrattoInterfaceController implements Initializable {
 	private void setupSpinners() {
 		setSpinnerSet();
 		for(Spinner<Integer> sp: spinnerSet)
-			sp.setValueFactory(svf);
+			sp.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
 	}
 	
 	private void setSpinnerSet() {

@@ -214,7 +214,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
 		preparedStatement.setString(1, provincia.getNome());
         preparedStatement.setDouble(2, provincia.getSuperficie());
         preparedStatement.setString(3, provincia.getCapoluogo());
-        preparedStatement.setString(4, provincia.getRegioneAppartenenza().getNome());
+        preparedStatement.setInt(4, provincia.getRegioneAppartenenza().getId());
 	}
 	
 	private Provincia getProvinciaFromRS(ResultSet result) throws SQLException {
