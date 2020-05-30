@@ -47,7 +47,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	provinces.add(getProvinciaFromRS(result));
+	           	provinces.add(getItemFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -61,11 +61,6 @@ public class ProvinciaDAO implements DAO<Provincia>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
         
@@ -87,7 +82,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	provincia = getProvinciaFromRS(result);
+            	provincia = getItemFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -101,11 +96,6 @@ public class ProvinciaDAO implements DAO<Provincia>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -142,11 +132,6 @@ public class ProvinciaDAO implements DAO<Provincia>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
  
         return success;
@@ -173,11 +158,6 @@ public class ProvinciaDAO implements DAO<Provincia>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
         return success;
 	}
@@ -201,11 +181,6 @@ public class ProvinciaDAO implements DAO<Provincia>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-            	connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
 		return success;
 	}
@@ -217,7 +192,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
         preparedStatement.setInt(4, provincia.getRegioneAppartenenza().getId());
 	}
 	
-	private Provincia getProvinciaFromRS(ResultSet result) throws SQLException {
+	public Provincia getItemFromRS(ResultSet result) throws SQLException {
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		Regione regione = null;
 		try {

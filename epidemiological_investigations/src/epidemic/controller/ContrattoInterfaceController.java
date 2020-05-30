@@ -42,6 +42,7 @@ public class ContrattoInterfaceController implements Initializable {
 	private ObservableList<String> listaComuniResponsabilita = FXCollections.observableArrayList();
 	//private SpinnerValueFactory<Integer> svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0);
 	private HashSet<Spinner<Integer>> spinnerSet;
+	private final static double WEEK_MS = 6.048e+8;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -73,11 +74,15 @@ public class ContrattoInterfaceController implements Initializable {
 		}
 		
 		Comune comuneRiferimento = database.getComuneDAO().getComuneDaNome(nomeComune);
-		if(comuneRiferimento == null) {
-			System.out.println("somethings wrong here");
+		Date dataOggi = new Date(System.currentTimeMillis());
+		
+		if(!dateIsValid(dataOggi, comuneRiferimento)) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setHeaderText("Segnalazione già effettuata per questa settimana!");
+			alert.showAndWait();
 			return;
 		}
-		Date dataOggi = new Date(System.currentTimeMillis());
+		
 		List<Contagio> contagi = new ArrayList<>();
 		
 		fillContagi(contagi);
@@ -96,6 +101,13 @@ public class ContrattoInterfaceController implements Initializable {
 		gridMalattie.setDisable(true);
 	}
 	
+	private boolean dateIsValid(Date dataOggi, Comune comuneRiferimento) throws IOException {
+		SegnalazioneContagi ultimaSegnalazione = database.getSegnalazioneContagiDAO().getLastForComune(comuneRiferimento);
+		if(dataOggi.getTime() < ultimaSegnalazione.getData().getTime() + WEEK_MS)
+			return false;
+		return true;
+	}
+
 	private void fillContagi(List<Contagio> contagi) {
 		contagi.add(new Contagio(MalattiaContagiosa.INFLUENZA, spinInfluenze.getValue(), spinInfluenzeTI.getValue()));
 		contagi.add(new Contagio(MalattiaContagiosa.INFLUENZA_COMPLICAZIONI, spinComplicazioni.getValue(), spinComplicazioniTI.getValue()));

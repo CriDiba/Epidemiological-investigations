@@ -32,6 +32,41 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 		return istance;
 	}
 	
+	public SegnalazioneContagi getLastForComune(Comune comune) {
+		SegnalazioneContagi segnContagi = null;
+		Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet result = null;
+        
+        try {
+        	connection = MySqlDAOFactory.createConnection();
+            preparedStatement = connection.prepareStatement(queries.getProperty("read_per_comune_query"));
+            preparedStatement.setInt(1, comune.getId());
+            preparedStatement.execute();
+            result = preparedStatement.getResultSet();
+            
+            while(result.next())
+            	if(result.isLast())
+            		segnContagi = getItemFromRS(result);
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                result.close();
+            } catch (Exception rse) {
+                rse.printStackTrace();
+            }
+            try {
+                preparedStatement.close();
+            } catch (Exception sse) {
+                sse.printStackTrace();
+            }
+        }
+ 
+        return segnContagi;
+	}
+	
 	@Override
 	public List<SegnalazioneContagi> getAll() {
 		List<SegnalazioneContagi> segnContagi = new ArrayList<>();
@@ -46,7 +81,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             result = preparedStatement.getResultSet();
            
             while(result.next())
-            	segnContagi.add(getSegnalazioneFromRS(result));
+            	segnContagi.add(getItemFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -60,11 +95,6 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
         
@@ -87,7 +117,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	segnContagi = getSegnalazioneFromRS(result);
+            	segnContagi = getItemFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -101,11 +131,6 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -144,11 +169,6 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
  
         return success;
@@ -174,11 +194,6 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
         return success;
 	}
@@ -202,11 +217,6 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-            	connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
 		return success;
 	}
@@ -216,7 +226,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 		preparedStatement.setInt(2, segnContagi.getComuneRiferimento().getId());
 	}
 	
-	private SegnalazioneContagi getSegnalazioneFromRS(ResultSet result) throws SQLException {
+	public SegnalazioneContagi getItemFromRS(ResultSet result) throws SQLException {
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		List<Contagio> listaContagi = new ArrayList<>();
 		Comune comune = null;

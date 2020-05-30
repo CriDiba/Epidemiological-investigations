@@ -6,27 +6,29 @@ import java.util.Properties;
 
 
 public class MySqlDAOFactory {
-	
+	private static Connection connection = null;
     /**
      * Metodo per creare una connessione sul DB MySQL
      * 
      * @return l'oggetto Connection.
+     * @throws SQLException 
      */
-    public static Connection createConnection() {
-        Connection connection = null;
-                
-        try {
-            Properties config = new Properties();
-        	config.load(new FileInputStream("config"));
-        	
-            Class.forName(config.getProperty("jdbcDriver"));
-            connection = DriverManager.getConnection(config.getProperty("jdbcUrl"), config.getProperty("jdbcUsername"), config.getProperty("jdbcPassword"));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException | IOException e) {
-        	e.printStackTrace();
-        }
-        
+    public static Connection createConnection() throws SQLException {
+    	
+    	if(connection == null || connection.isClosed()) {
+	        try {
+	            Properties config = new Properties();
+	        	config.load(new FileInputStream("config"));
+	        	
+	            Class.forName(config.getProperty("jdbcDriver"));
+	            connection = DriverManager.getConnection(config.getProperty("jdbcUrl"), config.getProperty("jdbcUsername"), config.getProperty("jdbcPassword"));
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        } catch (ClassNotFoundException | IOException e) {
+	        	e.printStackTrace();
+	        }
+    	}
+    	
         return connection;
     }
     

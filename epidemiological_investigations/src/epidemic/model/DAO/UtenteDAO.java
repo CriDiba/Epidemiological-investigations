@@ -42,24 +42,9 @@ public class UtenteDAO implements DAO<Utente>{
             preparedStatement.setString(1, username);
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
- 
-            if (result.next() && result != null) {
-            	Ruolo ruolo = Ruolo.values()[result.getInt("ruolo")];
-            	switch(ruolo) {
-	            	case ADMIN: 
-	            		utente = new Admin(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case ANALISTA:
-	            		utente = new Analista(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case AUTORIZZATO: 
-	            		utente = new Autorizzato(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case CONTRATTO:
-	            		utente = new Contratto(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	        	}
-            } 
+            
+            if (result.next() && result != null) 
+            	utente = getItemFromRS(result);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -72,11 +57,6 @@ public class UtenteDAO implements DAO<Utente>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -99,26 +79,9 @@ public class UtenteDAO implements DAO<Utente>{
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
  
-            while (result.next()) {
-            	Ruolo ruolo = Ruolo.values()[result.getInt("ruolo")];
-            	Utente utente = null;
-            	switch(ruolo) {
-	            	case ADMIN: 
-	            		utente = new Admin(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case ANALISTA:
-	            		utente = new Analista(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case AUTORIZZATO: 
-	            		utente = new Autorizzato(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case CONTRATTO:
-	            		utente = new Contratto(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-            	}
-                        	
-            	users.add(utente);
-            }
+            while (result.next())
+            	users.add(getItemFromRS(result));
+            
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -132,11 +95,6 @@ public class UtenteDAO implements DAO<Utente>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
         
@@ -157,23 +115,9 @@ public class UtenteDAO implements DAO<Utente>{
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
  
-            if (result.next() && result != null) {
-            	Ruolo ruolo = Ruolo.values()[result.getInt("ruolo")];
-            	switch(ruolo) {
-	            	case ADMIN: 
-	            		utente = new Admin(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case ANALISTA:
-	            		utente = new Analista(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case AUTORIZZATO: 
-	            		utente = new Autorizzato(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	            	case CONTRATTO:
-	            		utente = new Contratto(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-	            		break;
-	        	}
-            } 
+            if (result.next() && result != null) 
+            	utente = getItemFromRS(result);
+            
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -186,11 +130,6 @@ public class UtenteDAO implements DAO<Utente>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -231,11 +170,6 @@ public class UtenteDAO implements DAO<Utente>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
  
         return success;
@@ -265,11 +199,6 @@ public class UtenteDAO implements DAO<Utente>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
         return success;
 	}
@@ -293,13 +222,29 @@ public class UtenteDAO implements DAO<Utente>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-            	connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
         return success;
+	}
+
+	@Override
+	public Utente getItemFromRS(ResultSet result) throws SQLException {
+        Ruolo ruolo = Ruolo.values()[result.getInt("ruolo")];
+        switch(ruolo) {
+           	case ADMIN: 
+           		return new Admin(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		
+           	case ANALISTA:
+           		return new Analista(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		
+           	case AUTORIZZATO: 
+           		return new Autorizzato(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		
+           	case CONTRATTO:
+           		return new Contratto(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           	
+           	default:
+           		return null;
+        } 
 	}
 
 }

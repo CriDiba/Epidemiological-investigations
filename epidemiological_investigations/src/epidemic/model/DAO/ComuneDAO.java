@@ -50,7 +50,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
  
             if (result != null && result.next())
-            	comune = getComuneFromRS(result);
+            	comune = getItemFromRS(result);
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -64,11 +64,6 @@ public class ComuneDAO implements DAO<Comune>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -104,11 +99,6 @@ public class ComuneDAO implements DAO<Comune>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
  
         return nomiComuni;
@@ -129,7 +119,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-            	municipalities.add(getComuneFromRS(result));
+            	municipalities.add(getItemFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -143,11 +133,6 @@ public class ComuneDAO implements DAO<Comune>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
         
@@ -169,7 +154,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	comune = getComuneFromRS(result);
+            	comune = getItemFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -183,11 +168,6 @@ public class ComuneDAO implements DAO<Comune>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -224,11 +204,6 @@ public class ComuneDAO implements DAO<Comune>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
  
         return success;
@@ -254,11 +229,6 @@ public class ComuneDAO implements DAO<Comune>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
         return success;
 	}
@@ -282,11 +252,6 @@ public class ComuneDAO implements DAO<Comune>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-            	connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
 		return success;
 	}
@@ -302,7 +267,8 @@ public class ComuneDAO implements DAO<Comune>{
 		preparedStatement.setInt(8, comune.getResponsabile().getId());
 	}
 	
-	private Comune getComuneFromRS(ResultSet result) throws SQLException {
+	@Override
+	public Comune getItemFromRS(ResultSet result) throws SQLException {
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		Provincia provincia;
 		

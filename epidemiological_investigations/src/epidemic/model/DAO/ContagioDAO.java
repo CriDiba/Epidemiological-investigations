@@ -14,7 +14,6 @@ import java.util.Properties;
 
 import epidemic.model.Contagio;
 import epidemic.model.MalattiaContagiosa;
-import epidemic.model.SegnalazioneContagi;
 
 public class ContagioDAO implements DAO<Contagio>{
 	private static ContagioDAO istance;
@@ -46,7 +45,7 @@ public class ContagioDAO implements DAO<Contagio>{
             result = preparedStatement.getResultSet();
             
             while(result.next())
-            	contagi.add(getContagioFromRS(result));
+            	contagi.add(getItemFromRS(result));
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -60,11 +59,6 @@ public class ContagioDAO implements DAO<Contagio>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -85,7 +79,7 @@ public class ContagioDAO implements DAO<Contagio>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-            	contagi.add(getContagioFromRS(result));
+            	contagi.add(getItemFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -99,11 +93,6 @@ public class ContagioDAO implements DAO<Contagio>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
         
@@ -125,7 +114,7 @@ public class ContagioDAO implements DAO<Contagio>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	contagio = getContagioFromRS(result);
+            	contagio = getItemFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -139,11 +128,6 @@ public class ContagioDAO implements DAO<Contagio>{
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -180,11 +164,6 @@ public class ContagioDAO implements DAO<Contagio>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
  
         return success;
@@ -211,11 +190,6 @@ public class ContagioDAO implements DAO<Contagio>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
         return success;
 	}
@@ -239,11 +213,6 @@ public class ContagioDAO implements DAO<Contagio>{
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-            	connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
 		return success;
 	}
@@ -256,22 +225,10 @@ public class ContagioDAO implements DAO<Contagio>{
 		preparedStatement.setInt(4, contagio.getSegnalazione().getId());
 	}
 	
-	private Contagio getContagioFromRS(ResultSet result) throws SQLException {
-		
-		MySqlDAOFactory database = new MySqlDAOFactory();
-		SegnalazioneContagi segnalazione = null;
-		
-		try {
-			segnalazione = database.getSegnalazioneContagiDAO().get(result.getInt("id_segnalazione"));
-		} catch(IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		
+	public Contagio getItemFromRS(ResultSet result) throws SQLException {
 		Contagio contagio = new Contagio(MalattiaContagiosa.values()[result.getInt("malattia")],
 							result.getInt("persone_ricoverate"), result.getInt("persone_in_cura"));
 		
-		contagio.setSegnalazione(segnalazione);
 		contagio.setId(result.getInt("id"));
 		return contagio;
 	}

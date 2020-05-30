@@ -45,7 +45,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	regions.add(getRegioneFromRS(result));
+	           	regions.add(getItemFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -59,11 +59,6 @@ public class RegioneDAO implements DAO<Regione> {
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
         
@@ -85,7 +80,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	regione = getRegioneFromRS(result);
+            	regione = getItemFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -99,11 +94,6 @@ public class RegioneDAO implements DAO<Regione> {
                 preparedStatement.close();
             } catch (Exception sse) {
                 sse.printStackTrace();
-            }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
             }
         }
  
@@ -140,11 +130,6 @@ public class RegioneDAO implements DAO<Regione> {
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
  
         return success;
@@ -170,11 +155,6 @@ public class RegioneDAO implements DAO<Regione> {
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-                connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
         return success;
 	}
@@ -198,11 +178,6 @@ public class RegioneDAO implements DAO<Regione> {
             } catch (Exception sse) {
                 sse.printStackTrace();
             }
-            try {
-            	connection.close();
-            } catch (Exception cse) {
-                cse.printStackTrace();
-            }
         }
 		return success;
 	}
@@ -213,7 +188,7 @@ public class RegioneDAO implements DAO<Regione> {
          preparedStatement.setString(3, regione.getCapoluogo());
 	}
 	
-	private Regione getRegioneFromRS(ResultSet result) throws SQLException {
+	public Regione getItemFromRS(ResultSet result) throws SQLException {
 		return new Regione(result.getInt("id"), result.getString("nome"), result.getDouble("superficie"), result.getString("capoluogo"));
 	}
 
