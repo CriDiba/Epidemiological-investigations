@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 
 public class LoginController {
@@ -24,6 +25,9 @@ public class LoginController {
 	@FXML
 	private PasswordField password;
 	
+	@FXML
+	private ProgressIndicator progressIndicator;
+	
 	private static int idUtente;
 	
 	public void setMainReference(MainClass mainReference) {
@@ -34,11 +38,13 @@ public class LoginController {
 	@FXML
 	public void handleLogin(ActionEvent e) throws IOException {
 		
+		progressIndicator.setVisible(true);
+		
 		MySqlDAOFactory database = new MySqlDAOFactory();
-
+		
     	Utente utente = database.getUtenteDAO().getUsername(username.getText());
     	
-    	if(toHash(password.getText()).equals(utente.getPassword())) {
+    	if(utente != null && toHash(password.getText()).equals(utente.getPassword())) {
     		switch(utente.getRuolo()) {
 		    	case ADMIN: 
 		    		adminInterface();
@@ -55,7 +61,7 @@ public class LoginController {
 			}
     	}
     
-    	
+    	progressIndicator.setVisible(false);
     	password.clear();
 		
 	}
