@@ -16,17 +16,39 @@ import epidemic.model.Decesso;
 import epidemic.model.Provincia;
 import epidemic.model.SegnalazioneDecessi;
 
+/**
+ * Implementazione dei metodi di comunicazione con il database
+ * per oggetti di tipo SegnalazioneDecessi
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
 	
 	private static SegnalazioneDecessiDAO istance;
 	private Properties queries;
 	
+	/**
+	 * Crea un oggetto SegnalazioneDecessiDAO importando le query specificate nel
+	 * file segnalazioneDecessiQueries.properties
+	 * 
+	 * @throws IOException
+	 */
 	private SegnalazioneDecessiDAO() throws IOException {
 		InputStream queryFile = new FileInputStream("queries/segnalazioneDecessiQueries.properties");
 		queries = new Properties();
 		queries.load(queryFile);
 	}
 	
+	/**
+	 * Utilizza il pattern Singleton per assicurarsi che venga creato
+	 * un solo SegnalazioneDecessiDAO per interagire con il database 
+	 * 
+	 * @return l'oggetto SegnalazioneDecessiDAO
+	 * @throws IOException
+	 */
 	public static SegnalazioneDecessiDAO getIstance() throws IOException {
 		if(istance == null)
 			istance = new SegnalazioneDecessiDAO();
@@ -116,7 +138,7 @@ public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromSegnalazione(preparedStatement, segnDecessi);
+            setPreparedStatementFromItem(preparedStatement, segnDecessi);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -151,7 +173,7 @@ public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromSegnalazione(preparedStatement, segnDecessi);
+            setPreparedStatementFromItem(preparedStatement, segnDecessi);
             preparedStatement.setInt(3, segnDecessi.getId());
             preparedStatement.execute();
             success = true;
@@ -190,13 +212,13 @@ public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
 		return success;
 	}
 	
-	
-	private void setPreparedStatementFromSegnalazione(PreparedStatement preparedStatement, SegnalazioneDecessi segnDecessi) throws SQLException {
+	@Override
+	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, SegnalazioneDecessi segnDecessi) throws SQLException {
 		preparedStatement.setDate(1, segnDecessi.getData());
 		preparedStatement.setInt(2, segnDecessi.getProvinciaRiferimento().getId());
 	}	
 	
-	
+	@Override
 	public SegnalazioneDecessi getItemFromRS(ResultSet result) throws SQLException {
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		List<Decesso> listaDecessi = new ArrayList<>();
@@ -213,7 +235,12 @@ public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
 		return new SegnalazioneDecessi(listaDecessi, result.getDate("data"), provincia);
 	}
 	
-	
+	/**
+	 * Crea nel database i decessi relativi ad una determinata segnalazione di decessi
+	 * 
+	 * @param segnDecessi la segnalazione di decessi
+	 * @param success id della segnalazione di decessi
+	 */
 	private void createDecessiPerSegnalazione(SegnalazioneDecessi segnDecessi, int success) {
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		DecessoDAO decessoDAO;

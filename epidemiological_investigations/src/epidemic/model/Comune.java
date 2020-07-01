@@ -3,6 +3,16 @@ package epidemic.model;
 import java.sql.Date;
 import java.util.List;
 
+/**
+ * Rappresenta un Comune italiano caratterizzato da: un codice ISTAT univoco,
+ * una data di istituzione, il tipo di territorio, la presenza del mare, 
+ * una provincia di appartenenza
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class Comune extends Localita {
 	private final String istat;
 	private final Date dataIstituzione;
@@ -12,6 +22,17 @@ public class Comune extends Localita {
 	private Contratto responsabile;
 	private List<SegnalazioneContagi> segnalazioniContagi;
 	
+	/**
+	 * Crea un comune
+	 * 
+	 * @param nome nome del comune
+	 * @param superficie superficie in km^2
+	 * @param istat codice istat univoco
+	 * @param dataIstituzione data di istituzione
+	 * @param territorio morfologia del territorio
+	 * @param sulMare presenza del mare
+	 * @param provinciaAppartenenza provincia di appartenenza
+	 */
 	public Comune(String nome, double superficie, String istat, Date dataIstituzione, Territorio territorio, boolean sulMare, Provincia provinciaAppartenenza) {
 		super(nome, superficie);
 		
@@ -23,7 +44,6 @@ public class Comune extends Localita {
 		this.territorio = territorio;
 		this.sulMare = sulMare;
 		this.provinciaAppartenenza = provinciaAppartenenza;
-
 	}
 	
 	
@@ -34,7 +54,6 @@ public class Comune extends Localita {
 	public void setSegnalazioniContagi(List<SegnalazioneContagi> segnalazioniContagi) {
 		this.segnalazioniContagi = segnalazioniContagi;
 	}
-
 
 	public void setResponsabile(Contratto responsabile) {
 		this.responsabile = responsabile;
@@ -47,7 +66,7 @@ public class Comune extends Localita {
 	public String getIstat() {
 		return istat;
 	}
-
+	
 	public Date getDataIstituzione() {
 		return dataIstituzione;
 	}

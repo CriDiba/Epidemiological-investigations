@@ -3,12 +3,27 @@ package epidemic.model;
 import java.sql.Date;
 import java.util.List;
 
+/**
+ * Rappresenta una segnalazione annuale dei deceduti in una specifica provincia
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class SegnalazioneDecessi {
 	private int id;
 	private List<Decesso> decessi;
 	private Date data;
 	private Provincia provinciaRiferimento;
 	
+	/**
+	 * Crea una segnalazione di decessi
+	 * 
+	 * @param decessi lista di diversi tipi di decessi
+	 * @param data data di riferimento
+	 * @param provinciaRiferimento provincia di riferimento
+	 */
 	public SegnalazioneDecessi(List<Decesso> decessi, Date data, Provincia provinciaRiferimento) {
 		this.data = data;
 		this.provinciaRiferimento = provinciaRiferimento;

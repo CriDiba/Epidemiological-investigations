@@ -13,17 +13,39 @@ import java.util.List;
 import java.util.Properties;
 import epidemic.model.Regione;
 
+/**
+ * Implementazione dei metodi di comunicazione con il database
+ * per oggetti di tipo Regione
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class RegioneDAO implements DAO<Regione> {
 
 	private static RegioneDAO istance;
 	private Properties queries;
 	
+	/**
+	 * Crea un oggetto RegioneDAO importando le query specificate nel
+	 * file regioniQueries.properties
+	 * 
+	 * @throws IOException
+	 */
 	private RegioneDAO() throws IOException {
 		InputStream queryFile = new FileInputStream("queries/regioniQueries.properties");
 		queries = new Properties();
 		queries.load(queryFile);
 	}
 	
+	/**
+	 * Utilizza il pattern Singleton per assicurarsi che venga creato
+	 * un solo RegioneDAO per interagire con il database
+	 * 
+	 * @return l'oggetto RegioneDAO
+	 * @throws IOException
+	 */
 	public static RegioneDAO getIstance() throws IOException {
 		if(istance == null)
 			istance = new RegioneDAO();
@@ -110,7 +132,7 @@ public class RegioneDAO implements DAO<Regione> {
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromRegione(preparedStatement, regione);           
+            setPreparedStatementFromItem(preparedStatement, regione);           
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -143,7 +165,7 @@ public class RegioneDAO implements DAO<Regione> {
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromRegione(preparedStatement, regione);
+            setPreparedStatementFromItem(preparedStatement, regione);
             preparedStatement.setInt(4, regione.getId());
             preparedStatement.execute();
             success = true;
@@ -182,14 +204,18 @@ public class RegioneDAO implements DAO<Regione> {
 		return success;
 	}
 	
-	private void setPreparedStatementFromRegione(PreparedStatement preparedStatement, Regione regione) throws SQLException {
+	@Override
+	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, Regione regione) throws SQLException {
 		 preparedStatement.setString(1, regione.getNome());
          preparedStatement.setDouble(2, regione.getSuperficie());
          preparedStatement.setString(3, regione.getCapoluogo());
 	}
 	
+	@Override
 	public Regione getItemFromRS(ResultSet result) throws SQLException {
-		return new Regione(result.getInt("id"), result.getString("nome"), result.getDouble("superficie"), result.getString("capoluogo"));
+		Regione regione = new Regione(result.getString("nome"), result.getDouble("superficie"), result.getString("capoluogo"));
+		regione.setId(result.getInt("id"));
+		return regione;
 	}
 
 }

@@ -1,8 +1,23 @@
 package epidemic.model;
 
+/**
+ * Rappresenta una Regione italiana con uno specifico capoluogo
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class Regione extends Localita{
 	private String capoluogo;
 	
+	/**
+	 * Crea una regione
+	 * 
+	 * @param nome nome della regione
+	 * @param superficie superficie in km^2
+	 * @param capoluogo nome del capoluogo di regione
+	 */
 	public Regione(String nome, double superficie, String capoluogo) {
 		super(nome, superficie);
 		if(!isValid(capoluogo))
@@ -10,13 +25,11 @@ public class Regione extends Localita{
 		this.capoluogo = capoluogo;
 	}
 	
-	public Regione(int id, String nome, double superficie, String capoluogo) {
-		this(nome, superficie, capoluogo);
-		setId(id);
-	}
-	
 	public String getCapoluogo() {
 		return capoluogo;
 	}
 
+	public void setCapoluogo(String capoluogo) {
+		this.capoluogo = capoluogo;
+	}
 }

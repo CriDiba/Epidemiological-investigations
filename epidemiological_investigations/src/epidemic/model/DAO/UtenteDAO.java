@@ -14,22 +14,52 @@ import java.util.Properties;
 
 import epidemic.model.*;
 
+/**
+ * Implementazione dei metodi di comunicazione con il database
+ * per oggetti di tipo Utente
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class UtenteDAO implements DAO<Utente>{
 	private static UtenteDAO istance;
 	private Properties queries;
 	
+	/**
+	 * Crea un oggetto UtenteDAO importando le query specificate nel
+	 * file utentiQueries.properties
+	 * 
+	 * @throws IOException
+	 */
 	private UtenteDAO() throws IOException {
 		InputStream queryFile = new FileInputStream("queries/utentiQueries.properties");
 		queries = new Properties();
 		queries.load(queryFile);
 	}
 	
+	/**
+	 * Utilizza il pattern Singleton per assicurarsi che venga creato
+	 * un solo UtenteDAO per interagire con il database
+	 * 
+	 * @return l'oggetto UtenteDAO
+	 * @throws IOException
+	 */
 	public static UtenteDAO getIstance() throws IOException {
 		if(istance == null)
 			istance = new UtenteDAO();
 		return istance;
 	}
     
+	
+	/**
+	 * Restituisce un oggetto utente cercandolo nel 
+	 * database in base al suo username
+	 * 
+	 * @param username username da cercare
+	 * @return l'oggetto utente trovato
+	 */
     public Utente getUsername(String username) {
 		Utente utente = null;
 		Connection connection = null;
@@ -61,9 +91,8 @@ public class UtenteDAO implements DAO<Utente>{
         }
  
         return utente;
-    	
-
     }
+    
 
 	@Override
 	public List<Utente> getAll() {
@@ -146,11 +175,7 @@ public class UtenteDAO implements DAO<Utente>{
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, utente.getNome());
-            preparedStatement.setString(2, utente.getCognome());
-            preparedStatement.setString(3, utente.getUsername());
-            preparedStatement.setString(4, utente.getPassword());
-            preparedStatement.setInt(5, utente.getRuolo().ordinal());
+            setPreparedStatementFromItem(preparedStatement, utente);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
  
@@ -183,11 +208,7 @@ public class UtenteDAO implements DAO<Utente>{
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            preparedStatement.setString(1, utente.getNome());
-            preparedStatement.setString(2, utente.getCognome());
-            preparedStatement.setString(3, utente.getUsername());
-            preparedStatement.setString(4, utente.getPassword());
-            preparedStatement.setInt(5, utente.getRuolo().ordinal());
+            setPreparedStatementFromItem(preparedStatement, utente);
             preparedStatement.setInt(6, utente.getId());
             preparedStatement.execute();
             success = true;
@@ -228,23 +249,40 @@ public class UtenteDAO implements DAO<Utente>{
 
 	@Override
 	public Utente getItemFromRS(ResultSet result) throws SQLException {
+		Utente utente;
         Ruolo ruolo = Ruolo.values()[result.getInt("ruolo")];
         switch(ruolo) {
            	case ADMIN: 
-           		return new Admin(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		utente = new Admin(result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		break;
            		
            	case ANALISTA:
-           		return new Analista(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		utente = new Analista(result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		break;
            		
            	case AUTORIZZATO: 
-           		return new Autorizzato(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		utente = new Autorizzato(result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		break;
            		
            	case CONTRATTO:
-           		return new Contratto(result.getInt(1), result.getString(2), result.getString(3), result.getString(4), result.getString(5));
-           	
+           		utente = new Contratto(result.getString(2), result.getString(3), result.getString(4), result.getString(5));
+           		break;
+           		
            	default:
            		return null;
-        } 
+        }
+        
+        utente.setId(result.getInt(1));
+        return utente;
+	}
+
+	@Override
+	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, Utente utente) throws SQLException {
+        preparedStatement.setString(1, utente.getNome());
+        preparedStatement.setString(2, utente.getCognome());
+        preparedStatement.setString(3, utente.getUsername());
+        preparedStatement.setString(4, utente.getPassword());
+        preparedStatement.setInt(5, utente.getRuolo().ordinal());
 	}
 
 }
