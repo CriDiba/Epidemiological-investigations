@@ -62,6 +62,16 @@ public class Comune extends Localita {
 
 	public Provincia getProvinciaAppartenenza() {
 		return provinciaAppartenenza;
-	}	
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof Comune) && ((Comune)obj).getNome().equals(this.getNome());		
+	}
+	
+	@Override
+	public String toString() {
+		return this.getNome();
+	}
 	
 }

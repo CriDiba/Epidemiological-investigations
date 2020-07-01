@@ -238,7 +238,9 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 			return null;
 		}
 		
-		return new SegnalazioneContagi(listaContagi, result.getDate("data"), comune);
+		SegnalazioneContagi segnalazione = new SegnalazioneContagi(listaContagi, result.getDate("data"), comune);
+		segnalazione.setId(result.getInt("id"));
+		return segnalazione;
 	}
 	
 	private void createContagiPerSegnalazione(SegnalazioneContagi segnContagi, int success) {

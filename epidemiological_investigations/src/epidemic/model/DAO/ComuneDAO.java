@@ -70,8 +70,8 @@ public class ComuneDAO implements DAO<Comune>{
         return comune;
 	}
 	
-	public ObservableList<String> getNomeComuniPerResponsabile(int idUtenteContratto) {
-		ObservableList<String> nomiComuni = FXCollections.observableArrayList();
+	public ObservableList<Comune> getComuniPerResponsabile(int idUtenteContratto) {
+		ObservableList<Comune> comuni = FXCollections.observableArrayList();
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -84,7 +84,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
  
             while (result.next())
-            	nomiComuni.add(result.getString("nome"));
+            	comuni.add(getItemFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -101,7 +101,7 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
  
-        return nomiComuni;
+        return comuni;
 	}
 	
 	@Override
