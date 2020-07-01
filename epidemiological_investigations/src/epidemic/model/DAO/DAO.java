@@ -6,10 +6,6 @@ import java.util.List;
 
 public interface DAO<T> {
 	
-	/**
-	 * 
-	 * @return
-	 */
 	public List<T> getAll();
 	
 	public T get(int id);

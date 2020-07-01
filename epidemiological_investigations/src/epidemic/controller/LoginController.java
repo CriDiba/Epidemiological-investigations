@@ -47,7 +47,7 @@ public class LoginController {
 		    		//analistaInterface();
 		    		break;
 		    	case AUTORIZZATO: 
-		    		//autorizzatoInterface();
+		    		autorizzatoInterface();
 		    		break;
 		    	case CONTRATTO:
 		    		contrattoInterface(utente.getId());
@@ -89,6 +89,14 @@ public class LoginController {
 		Scene scene = new Scene(loader.load());
 		mainReference.getPrimaryStage().setScene(scene);
 	}
+	
+	private void autorizzatoInterface() throws IOException{
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(MainClass.class.getResource("/epidemic/view/AutorizzatoInterface.fxml"));
+		Scene scene = new Scene(loader.load());
+		mainReference.getPrimaryStage().setScene(scene);
+	}
+	
 	
 	public static int getIdSession() {
 		return idUtente;

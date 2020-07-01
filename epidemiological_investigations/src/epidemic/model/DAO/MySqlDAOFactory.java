@@ -7,6 +7,7 @@ import java.util.Properties;
 
 public class MySqlDAOFactory {
 	private static Connection connection = null;
+	
     /**
      * Metodo per creare una connessione sul DB MySQL
      * 
@@ -18,7 +19,7 @@ public class MySqlDAOFactory {
     	if(connection == null || connection.isClosed()) {
 	        try {
 	            Properties config = new Properties();
-	        	config.load(new FileInputStream("config"));
+	        	config.load(new FileInputStream("config.properties"));
 	        	
 	            Class.forName(config.getProperty("jdbcDriver"));
 	            connection = DriverManager.getConnection(config.getProperty("jdbcUrl"), config.getProperty("jdbcUsername"), config.getProperty("jdbcPassword"));
@@ -33,7 +34,6 @@ public class MySqlDAOFactory {
     }
     
     
-
 	public UtenteDAO getUtenteDAO() throws IOException {
 		return UtenteDAO.getIstance();
 	}
@@ -56,6 +56,14 @@ public class MySqlDAOFactory {
 
 	public ContagioDAO getContagioDAO() throws IOException {
 		return ContagioDAO.getIstance();
+	}
+	
+	public SegnalazioneDecessiDAO getSegnalazioneDecessiDAO() throws IOException {
+		return SegnalazioneDecessiDAO.getIstance();
+	}
+
+	public DecessoDAO getDecessoDAO() throws IOException {
+		return DecessoDAO.getIstance();
 	}
 
 }

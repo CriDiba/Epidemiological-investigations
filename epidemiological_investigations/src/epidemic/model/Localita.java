@@ -2,9 +2,9 @@
 package epidemic.model;
 
 public abstract class Localita {
+	private int id;
 	private String nome;
 	private double superficie;
-	private int id;
 	
 	public Localita(String nome, double superficie) {
 		if(!isValid(nome) || superficie < 0)

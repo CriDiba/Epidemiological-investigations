@@ -5,7 +5,7 @@ import java.util.List;
 public class Provincia extends Localita {
 	private String capoluogo;
 	private final Regione regioneAppartenenza;
-	private List<SegnalazioneContagi> segnalazioniDecessi;
+	private List<SegnalazioneDecessi> segnalazioniDecessi;
 
 
 	public Provincia(String nome, double superficie, String capoluogo, Regione regioneAppartenenza) {
@@ -16,11 +16,11 @@ public class Provincia extends Localita {
 		this.regioneAppartenenza = regioneAppartenenza;
 	}
 	
-	public List<SegnalazioneContagi> getSegnalazioniDecessi() {
+	public List<SegnalazioneDecessi> getSegnalazioniDecessi() {
 		return segnalazioniDecessi;
 	}
 
-	public void setSegnalazioniDecessi(List<SegnalazioneContagi> segnalazioniDecessi) {
+	public void setSegnalazioniDecessi(List<SegnalazioneDecessi> segnalazioniDecessi) {
 		this.segnalazioniDecessi = segnalazioniDecessi;
 	}
 
