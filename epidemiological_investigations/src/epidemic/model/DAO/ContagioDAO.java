@@ -145,6 +145,7 @@ public class ContagioDAO implements DAO<Contagio>{
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
             setPreparedStatementFromContagio(preparedStatement, contagio);
+            preparedStatement.setInt(4, contagio.getSegnalazione().getId());
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -179,7 +180,6 @@ public class ContagioDAO implements DAO<Contagio>{
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
             setPreparedStatementFromContagio(preparedStatement, contagio);
-            preparedStatement.setInt(5, contagio.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -222,7 +222,7 @@ public class ContagioDAO implements DAO<Contagio>{
 		preparedStatement.setInt(1, contagio.getMalattia().ordinal());
 		preparedStatement.setInt(2, contagio.getPersoneRicoverate());
 		preparedStatement.setInt(3, contagio.getPersoneInCura());
-		preparedStatement.setInt(4, contagio.getSegnalazione().getId());
+		preparedStatement.setInt(4, contagio.getId());
 	}
 	
 	public Contagio getItemFromRS(ResultSet result) throws SQLException {

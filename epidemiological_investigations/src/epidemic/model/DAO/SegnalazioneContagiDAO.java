@@ -258,7 +258,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
         
         for(Contagio contagio: segnContagi.getContagi()) {
         	contagio.setSegnalazione(segnContagi);
-        	contagioDAO.create(contagio);
+        	contagio.setId(contagioDAO.create(contagio));
         }
 		
 	}

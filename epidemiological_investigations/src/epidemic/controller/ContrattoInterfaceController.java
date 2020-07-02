@@ -13,6 +13,8 @@ import epidemic.model.Contagio;
 import epidemic.model.MalattiaContagiosa;
 import epidemic.model.SegnalazioneContagi;
 import epidemic.model.DAO.MySqlDAOFactory;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -27,7 +29,19 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+
+/**
+ * Controller dell'interfaccia dedicata agli
+ * utenti che identificano il personale a contratto.
+ * 
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 
 public class ContrattoInterfaceController implements Initializable {
 	@FXML
@@ -54,7 +68,7 @@ public class ContrattoInterfaceController implements Initializable {
 	private ToggleButton btnForza;
 	
 	@FXML
-	private Label lblForza;
+	private Label lblForza, lblSegnalazione, lblMalattia, lblPressoMedico, lblTerapieIntensive;
 	
 	@FXML
 	private Spinner<Integer> spinPressoMedico, spinTerapieIntensive;
@@ -71,6 +85,9 @@ public class ContrattoInterfaceController implements Initializable {
 	@FXML
 	private TableColumn<SegnalazioneContagi, Comune> colComune;
 	
+	@FXML
+	private Button btnModifica;
+	
 	private MySqlDAOFactory database;
 	private ObservableList<Comune> listaComuniResponsabilita = FXCollections.observableArrayList();
 	private List<String> nomiComuniResponsabilita = new ArrayList<>();
@@ -79,9 +96,16 @@ public class ContrattoInterfaceController implements Initializable {
 	private static double WEEK_MS = 6.048e+8;
 	private final static Comune tuttiComuni = new Comune("Tutti i comuni", 0, "000000", null, null, true, null);
 	
+	
+	/**
+	 * Metodo inizializzatore per gli oggetti
+	 * che popolano l'interfaccia grafica e per
+	 * quelli di utilità che stanno in sottofondo
+	 */
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		gridMalattie.setDisable(true);
+		setupBindingsAndListeners();
 		setupSpinners();
 		comboMalattia.getItems().addAll(MalattiaContagiosa.values());
 		database = new MySqlDAOFactory();
@@ -102,39 +126,18 @@ public class ContrattoInterfaceController implements Initializable {
 		comboComuneTueSegnalazioni.setValue(tuttiComuni.getNome());
 		handleSceltaComune();
 	}
-	
-	private void initTableColumns() {
-		colIdSegnalazione.setCellValueFactory(new PropertyValueFactory<>("id"));
-		colDataSegnalazione.setCellValueFactory(new PropertyValueFactory<>("data"));
-		colComune.setCellValueFactory(new PropertyValueFactory<>("comuneRiferimento"));
-	}
-
-	private void initMap() throws IOException {
-		
-		for(Comune c: listaComuniResponsabilita)
-			nomiComuniResponsabilita.add(c.getNome());
-		
-		List<SegnalazioneContagi> tutteSegnalazioni = database.getSegnalazioneContagiDAO().getAll();
-		ArrayList<SegnalazioneContagi> tempArrayList;
-		
-		mappaComuneSegnalazioni.put(tuttiComuni, new ArrayList<>());
-		for(Comune comune: listaComuniResponsabilita) {
-			for(SegnalazioneContagi s: tutteSegnalazioni)
-				if(s.getComuneRiferimento().equals(comune)) {
-					mappaComuneSegnalazioni.putIfAbsent(comune, new ArrayList<>());
-					tempArrayList = mappaComuneSegnalazioni.get(comune);
-					tempArrayList.add(s);
-					tempArrayList = mappaComuneSegnalazioni.get(tuttiComuni);
-					tempArrayList.add(s);
-				}
-		}
-	}
 
 	@FXML
 	public void enableGrid() {
 		gridMalattie.setDisable(false);
 	}
 	
+	/**
+	 * Metodo che permette di forzare
+	 * l'inserimento di una segnalazione
+	 * dal momento che regolarmente è possibile
+	 * un solo inserimento a settimana.
+	 */
 	@FXML
 	public void handleForzaSegnalazione() {
 		if(WEEK_MS != 0) {
@@ -149,15 +152,24 @@ public class ContrattoInterfaceController implements Initializable {
 			btnForza.setText("Forza segnalazione");
 			lblForza.setVisible(false);
 		}
+		
+		if(comboComune.getSelectionModel().getSelectedItem() != null)
+			enableGrid();
 	}
 	
+	/**
+	 * Metodo che aggiorna le combobox
+	 * in base alla selezione di un comune
+	 */
 	@FXML
 	public void handleSceltaComune() {
 		Comune comuneSelezionato = getComuneSelezionato();
 		ArrayList<SegnalazioneContagi> segnalazioni = mappaComuneSegnalazioni.get(comuneSelezionato);
-		comboIdSegnalazione.setItems(FXCollections.observableArrayList(getIdSegnalazioni(segnalazioni)));
 		
-		tableView.setItems(FXCollections.observableArrayList(mappaComuneSegnalazioni.get(comuneSelezionato)));
+		comboIdSegnalazione.setItems(FXCollections.observableArrayList(getIdSegnalazioni(segnalazioni)));
+		tableView.setItems(FXCollections.observableArrayList(segnalazioni));
+		comboIdSegnalazione.setValue(null);
+		comboMalattia.setValue(null);
 	}
 	
 	private ArrayList<Integer> getIdSegnalazioni(List<SegnalazioneContagi> segnalazioni) {
@@ -173,7 +185,14 @@ public class ContrattoInterfaceController implements Initializable {
 				return comune;
 		return tuttiComuni;
 	}
-
+	
+	/**
+	 * Metodo che permette di aggiornare il database
+	 * con una nuova segnalazione, o avverte l'utente
+	 * che non è possibile effettuare tale segnalazione
+	 * 
+	 * @throws IOException
+	 */
 	@FXML
 	public void updateData() throws IOException {
 		String nomeComune = comboComune.getValue();
@@ -210,33 +229,66 @@ public class ContrattoInterfaceController implements Initializable {
 		//clear and disable grid
 		for(Spinner<Integer> sp: spinnerSet)
 			sp.getValueFactory().setValue(0);
-		comboComune.getSelectionModel().clearSelection();
+		comboComune.setValue(null);
 		gridMalattie.setDisable(true);
 		
-		comuneRiferimento = getReferenceToComune(comuneRiferimento);
+		for(Comune comune: mappaComuneSegnalazioni.keySet())
+			if(comune.equals(comuneRiferimento)) {
+				comuneRiferimento = comune;
+				break;
+			}
+		
 		mappaComuneSegnalazioni.get(comuneRiferimento).add(nuovaSegnalazione);
 		mappaComuneSegnalazioni.get(tuttiComuni).add(nuovaSegnalazione);
 		handleSceltaComune();
 	}
 	
-	private Comune getReferenceToComune(Comune comuneRiferimento) {
-		for(Comune comune: mappaComuneSegnalazioni.keySet())
-			if(comune.equals(comuneRiferimento))
-				return comune;
-		return null;
-	}
-
-	public void submitEdit() {
-		
+	/**
+	 * Metodo che invia al database
+	 * le modifiche effettuate su un
+	 * contagio di una segnalazione
+	 * @throws IOException
+	 */
+	@FXML
+	public void submitEdit() throws IOException {
+		for(SegnalazioneContagi segnalazione: mappaComuneSegnalazioni.get(getComuneSelezionato()))
+			if(segnalazione.getId() == comboIdSegnalazione.getValue()) {
+				for(Contagio contagio: segnalazione.getContagi())
+					if(contagio.getMalattia().equals(comboMalattia.getValue())) {
+						contagio.setPersoneInCura(spinPressoMedico.getValue());
+						contagio.setPersoneRicoverate(spinTerapieIntensive.getValue());
+						contagio.setSegnalazione(segnalazione);
+						database.getContagioDAO().update(contagio);
+						lblPressoMedico.setText(String.valueOf(spinPressoMedico.getValue()));
+						lblTerapieIntensive.setText(String.valueOf(spinTerapieIntensive.getValue()));
+						return;
+					}
+			}
 	}
 	
+	/**
+	 * Metodo che controlla se è passata
+	 * almeno una settimana dall'ultima segnalazione
+	 * 
+	 * @param dataOggi data della nuova segnalazione
+	 * @param comuneRiferimento comune di cui dobbiamo controllare l'ultima segnalazione
+	 * @return true se la è possibile fare una nuova segnalazione oggi
+	 * @throws IOException
+	 */
 	private boolean dateIsValid(Date dataOggi, Comune comuneRiferimento) throws IOException {
 		SegnalazioneContagi ultimaSegnalazione = database.getSegnalazioneContagiDAO().getLastForComune(comuneRiferimento);
 		if(dataOggi.getTime() < ultimaSegnalazione.getData().getTime() + WEEK_MS)
 			return false;
 		return true;
 	}
-
+	
+	/**
+	 * Metodo che riempie una lista di
+	 * oggetti Contagi sulla base del valore
+	 * degli spinners dell'interfaccia grafica.
+	 * 
+	 * @param contagi lista di Contagi
+	 */
 	private void fillContagi(List<Contagio> contagi) {
 		contagi.add(new Contagio(MalattiaContagiosa.INFLUENZA, spinInfluenze.getValue(), spinInfluenzeTI.getValue()));
 		contagi.add(new Contagio(MalattiaContagiosa.INFLUENZA_COMPLICAZIONI, spinComplicazioni.getValue(), spinComplicazioniTI.getValue()));
@@ -248,6 +300,9 @@ public class ContrattoInterfaceController implements Initializable {
 		contagi.add(new Contagio(MalattiaContagiosa.GASTROENTERITE, spinGastroenteriti.getValue(), spinGastroenteritiTI.getValue()));
 	}
 	
+	/**
+	 * Metodo che inizializza gli spinner
+	 */
 	private void setupSpinners() {
 		setSpinnerSet();
 		for(Spinner<Integer> sp: spinnerSet)
@@ -256,6 +311,11 @@ public class ContrattoInterfaceController implements Initializable {
 		spinTerapieIntensive.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
 	}
 	
+	/**
+	 * Metodo che riempie un HashSet con gli
+	 * spinner dell'interfaccia per permettere
+	 * una più facile gestione di questi.
+	 */
 	private void setSpinnerSet() {
 		spinnerSet = new HashSet<>();
 		this.spinnerSet.add(spinInfluenze);
@@ -276,4 +336,86 @@ public class ContrattoInterfaceController implements Initializable {
 		this.spinnerSet.add(spinGastroenteritiTI);
 	}
 	
+	/**
+	 * Metodo di supporto che inizializza
+	 * la tabella
+	 */
+	private void initTableColumns() {
+		colIdSegnalazione.setCellValueFactory(new PropertyValueFactory<>("id"));
+		colDataSegnalazione.setCellValueFactory(new PropertyValueFactory<>("data"));
+		colComune.setCellValueFactory(new PropertyValueFactory<>("comuneRiferimento"));
+	}
+	
+	/**
+	 * Metodo di supporto che inizializza
+	 * la mappa Comune - Segnalazioni
+	 * 
+	 * @throws IOException
+	 */
+	private void initMap() throws IOException {		
+		List<SegnalazioneContagi> tutteSegnalazioni = database.getSegnalazioneContagiDAO().getAll();
+		
+		mappaComuneSegnalazioni.put(tuttiComuni, new ArrayList<>());
+		for(Comune comune: listaComuniResponsabilita) {
+			nomiComuniResponsabilita.add(comune.getNome());
+			for(SegnalazioneContagi s: tutteSegnalazioni)
+				if(s.getComuneRiferimento().equals(comune)) {
+					mappaComuneSegnalazioni.putIfAbsent(comune, new ArrayList<>());
+					mappaComuneSegnalazioni.get(comune).add(s);
+					mappaComuneSegnalazioni.get(tuttiComuni).add(s);
+				}
+		}
+	}
+	
+	/**
+	 * Metodo che imposta i bindings
+	 * e i listeners per gli elementi
+	 * dell'interfaccia grafica
+	 */
+	private void setupBindingsAndListeners() {
+		spinPressoMedico.disableProperty().bind(comboMalattia.valueProperty().isNull().or(comboIdSegnalazione.valueProperty().isNull()));
+		spinTerapieIntensive.disableProperty().bind(comboMalattia.valueProperty().isNull().or(comboIdSegnalazione.valueProperty().isNull()));
+		btnModifica.disableProperty().bind(comboMalattia.valueProperty().isNull().or(comboIdSegnalazione.valueProperty().isNull()));
+		lblSegnalazione.textProperty().bind(comboIdSegnalazione.valueProperty().asString());
+		lblMalattia.textProperty().bind(comboMalattia.valueProperty().asString());
+		lblSegnalazione.accessibleTextProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				handleLabelTextChange();
+			}
+        });
+		lblMalattia.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				handleLabelTextChange();
+			}
+        });
+	}
+	
+	
+	/**
+	 * Metodo che serve a modificare
+	 * il testo dei labels in base alla selezione
+	 * dell'utente
+	 */
+	private void handleLabelTextChange() {
+		if(!(lblSegnalazione.getText().equals("null") && lblMalattia.getText().equals("null"))) {
+			Contagio found = null;
+			for(SegnalazioneContagi segnalazione: mappaComuneSegnalazioni.get(getComuneSelezionato()))
+				if(segnalazione.getId() == comboIdSegnalazione.getValue()) {
+					for(Contagio c: segnalazione.getContagi())
+						if(c.getMalattia().equals(comboMalattia.getValue()))
+							found = c;
+					break;
+				}
+			lblPressoMedico.setText(String.valueOf(found.getPersoneInCura()));
+			lblTerapieIntensive.setText(String.valueOf(found.getPersoneRicoverate()));
+		}
+		else {
+			lblPressoMedico.setText("-");
+			lblTerapieIntensive.setText("-");
+		}
+	}
 }
+
+

@@ -157,12 +157,14 @@
                                           <Insets bottom="30.0" />
                                        </VBox.margin>
                                     </ComboBox>
-                                    <ComboBox fx:id="comboIdSegnalazione" editable="true" prefHeight="26.0" prefWidth="170.0" promptText="Id Segnalazione">
+                                    <Label text="Id Segnalazione" />
+                                    <ComboBox fx:id="comboIdSegnalazione" prefHeight="26.0" prefWidth="170.0">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
                                     </ComboBox>
-                                    <ComboBox fx:id="comboMalattia" editable="true" prefHeight="26.0" prefWidth="170.0" promptText="Malattia">
+                                    <Label text="Malattia" />
+                                    <ComboBox fx:id="comboMalattia" prefHeight="26.0" prefWidth="170.0">
                                        <VBox.margin>
                                           <Insets bottom="30.0" />
                                        </VBox.margin>
@@ -175,7 +177,7 @@
                                     </Spinner>
                                     <Label text="Terapie intensive" />
                                     <Spinner fx:id="spinTerapieIntensive" editable="true" prefWidth="170.0" />
-                                    <Button mnemonicParsing="false" onAction="#handleSceltaComune" text="Modifica">
+                                    <Button fx:id="btnModifica" mnemonicParsing="false" onAction="#submitEdit" text="Modifica">
                                        <VBox.margin>
                                           <Insets top="20.0" />
                                        </VBox.margin>
@@ -186,16 +188,50 @@
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                            <children>
-                              <TableView fx:id="tableView" layoutX="177.0" layoutY="178.0" prefHeight="600.8" prefWidth="553.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                <columns>
-                                  <TableColumn fx:id="colIdSegnalazione" prefWidth="75.0" text="Id Segnalazione" />
-                                  <TableColumn fx:id="colDataSegnalazione" prefWidth="75.0" text="Data segnalazione" />
-                                    <TableColumn fx:id="colComune" prefWidth="75.0" text="Comune" />
-                                </columns>
-                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </TableView>
+                              <SplitPane dividerPositions="0.7" orientation="VERTICAL" prefHeight="648.8" prefWidth="550.4" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <items>
+                                    <TableView fx:id="tableView" prefHeight="505.0" prefWidth="549.0">
+                                      <columns>
+                                        <TableColumn fx:id="colIdSegnalazione" prefWidth="75.0" text="Id Segnalazione" />
+                                        <TableColumn fx:id="colDataSegnalazione" prefWidth="75.0" text="Data segnalazione" />
+                                          <TableColumn fx:id="colComune" prefWidth="75.0" text="Comune" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Valori nel Database" wrappingWidth="102.33984375" />
+                                          <GridPane alignment="CENTER">
+                                            <columnConstraints>
+                                              <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <Label text="Segnalazione" />
+                                                <Label fx:id="lblSegnalazione" text="-" GridPane.columnIndex="1" />
+                                                <Label text="Malattia" GridPane.rowIndex="1" />
+                                                <Label text="Persone in cura presso medico di base" GridPane.rowIndex="2" />
+                                                <Label text="Persone in terapia intensiva" GridPane.rowIndex="3" />
+                                                <Label fx:id="lblMalattia" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label fx:id="lblPressoMedico" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label fx:id="lblTerapieIntensive" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets left="40.0" right="40.0" />
+                                             </VBox.margin>
+                                          </GridPane>
+                                       </children>
+                                    </VBox>
+                                </items>
+                              </SplitPane>
                            </children>
                         </AnchorPane>
                     </items>
