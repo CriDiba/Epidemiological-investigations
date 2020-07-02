@@ -1,5 +1,14 @@
 package epidemic.model;
 
+/**
+ * Rappresenta i dati di contagio delle persone ricoverate e
+ * di quelle in cura presso il medico di base per una specifica malattia contagiosa
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class Contagio {
 	private int id;
 	private MalattiaContagiosa malattia;
@@ -7,6 +16,13 @@ public class Contagio {
 	private int personeInCura;
 	private SegnalazioneContagi segnalazione;
 	
+	/**
+	 * Crea un descittore di contagio 
+	 * 
+	 * @param malattia tipo di malattia contagiosa
+	 * @param personeRicoverate numero di persone ricoverate
+	 * @param personeInCura numero di persone in cura presso il medico
+	 */
 	public Contagio(MalattiaContagiosa malattia, int personeRicoverate, int personeInCura) {
 		if(personeRicoverate < 0 || personeInCura < 0)
 			throw new IllegalArgumentException();
@@ -56,6 +72,5 @@ public class Contagio {
 		if(personeInCura >= 0)
 			this.personeInCura = personeInCura;
 	}
-	
 	
 }

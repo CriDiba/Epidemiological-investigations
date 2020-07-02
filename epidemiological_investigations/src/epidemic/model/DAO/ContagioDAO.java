@@ -15,22 +15,51 @@ import java.util.Properties;
 import epidemic.model.Contagio;
 import epidemic.model.MalattiaContagiosa;
 
+/**
+ * Implementazione dei metodi di comunicazione con il database
+ * per oggetti di tipo Contagio
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class ContagioDAO implements DAO<Contagio>{
 	private static ContagioDAO istance;
 	private Properties queries;
 	
+	/**
+	 * Crea un oggetto ContagioDAO importando le query specificate nel
+	 * file contagioQueries.properties
+	 * 
+	 * @throws IOException
+	 */
 	private ContagioDAO() throws IOException {
 		InputStream queryFile = new FileInputStream("queries/contagioQueries.properties");
 		queries = new Properties();
 		queries.load(queryFile);
 	}
 	
+	/**
+	 * Utilizza il pattern Singleton per assicurarsi che venga creato
+	 * un solo ContagioDAO per interagire con il database
+	 * 
+	 * @return l'oggetto ContagioDAO
+	 * @throws IOException
+	 */
 	public static ContagioDAO getIstance() throws IOException {
 		if(istance == null)
 			istance = new ContagioDAO();
 		return istance;
 	}
 	
+	/**
+	 * Restituisce una lista di contagi nel database che appartengono ad
+	 * una specifica segnalazione
+	 * 
+	 * @param id_segnalazione segnalazione da cercare
+	 * @return lista di contagi di una segnalazione
+	 */
 	public List<Contagio> getAllForSegnalazione(int id_segnalazione) {
 		List<Contagio> contagi = new ArrayList<>();
 		Connection connection = null;
@@ -144,7 +173,7 @@ public class ContagioDAO implements DAO<Contagio>{
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromContagio(preparedStatement, contagio);
+            setPreparedStatementFromItem(preparedStatement, contagio);
             preparedStatement.setInt(4, contagio.getSegnalazione().getId());
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
@@ -179,7 +208,7 @@ public class ContagioDAO implements DAO<Contagio>{
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromContagio(preparedStatement, contagio);
+			setPreparedStatementFromItem(preparedStatement, contagio);
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -217,14 +246,15 @@ public class ContagioDAO implements DAO<Contagio>{
 		return success;
 	}
 
-
-	private void setPreparedStatementFromContagio(PreparedStatement preparedStatement, Contagio contagio) throws SQLException {
+	@Override
+	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, Contagio contagio) throws SQLException {
 		preparedStatement.setInt(1, contagio.getMalattia().ordinal());
 		preparedStatement.setInt(2, contagio.getPersoneRicoverate());
 		preparedStatement.setInt(3, contagio.getPersoneInCura());
 		preparedStatement.setInt(4, contagio.getId());
 	}
 	
+	@Override
 	public Contagio getItemFromRS(ResultSet result) throws SQLException {
 		Contagio contagio = new Contagio(MalattiaContagiosa.values()[result.getInt("malattia")],
 							result.getInt("persone_ricoverate"), result.getInt("persone_in_cura"));

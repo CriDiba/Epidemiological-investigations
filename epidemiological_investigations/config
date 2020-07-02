@@ -1,4 +1,0 @@
-jdbcUsername=root
-jdbcPassword=
-jdbcDriver=com.mysql.cj.jdbc.Driver
-jdbcUrl=jdbc:mysql://localhost/test?serverTimezone=UTC

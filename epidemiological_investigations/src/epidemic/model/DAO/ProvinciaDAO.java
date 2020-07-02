@@ -15,17 +15,39 @@ import java.util.Properties;
 import epidemic.model.Provincia;
 import epidemic.model.Regione;
 
+/**
+ * Implementazione dei metodi di comunicazione con il database
+ * per oggetti di tipo Provincia
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class ProvinciaDAO implements DAO<Provincia>{
 	
 	private static ProvinciaDAO istance;
 	private Properties queries;
 	
+	/**
+	 * Crea un oggetto ProvinciaDAO importando le query specificate nel
+	 * file provinceQueries.properties
+	 * 
+	 * @throws IOException
+	 */
 	private ProvinciaDAO() throws IOException {
 		InputStream queryFile = new FileInputStream("queries/provinceQueries.properties");
 		queries = new Properties();
 		queries.load(queryFile);
 	}
 	
+	/**
+	 * Utilizza il pattern Singleton per assicurarsi che venga creato
+	 * un solo ProvinciaDAO per interagire con il database
+	 * 
+	 * @return l'oggetto ProvinciaDAO
+	 * @throws IOException
+	 */
 	public static ProvinciaDAO getIstance() throws IOException {
 		if(istance == null)
 			istance = new ProvinciaDAO();
@@ -112,7 +134,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromProvincia(preparedStatement, provincia);
+            setPreparedStatementFromItem(preparedStatement, provincia);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -146,7 +168,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromProvincia(preparedStatement, provincia);
+            setPreparedStatementFromItem(preparedStatement, provincia);
             preparedStatement.setInt(5, provincia.getId());
             preparedStatement.execute();
             success = true;
@@ -185,13 +207,15 @@ public class ProvinciaDAO implements DAO<Provincia>{
 		return success;
 	}
 
-	private void setPreparedStatementFromProvincia(PreparedStatement preparedStatement, Provincia provincia) throws SQLException {
+	@Override
+	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, Provincia provincia) throws SQLException {
 		preparedStatement.setString(1, provincia.getNome());
         preparedStatement.setDouble(2, provincia.getSuperficie());
         preparedStatement.setString(3, provincia.getCapoluogo());
         preparedStatement.setInt(4, provincia.getRegioneAppartenenza().getId());
 	}
 	
+	@Override
 	public Provincia getItemFromRS(ResultSet result) throws SQLException {
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		Regione regione = null;
@@ -202,8 +226,7 @@ public class ProvinciaDAO implements DAO<Provincia>{
 			return null;
 		}
 		
-		Provincia provincia =  new Provincia(result.getString("nome"), result.getDouble("superficie"), 
-    			result.getString("capoluogo"), regione);
+		Provincia provincia =  new Provincia(result.getString("nome"), result.getDouble("superficie"), result.getString("capoluogo"), regione);
 		provincia.setId(result.getInt("id"));
 		return provincia;
 	}

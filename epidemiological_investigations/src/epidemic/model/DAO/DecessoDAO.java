@@ -12,73 +12,71 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import epidemic.model.Comune;
-import epidemic.model.Provincia;
-import epidemic.model.Territorio;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import epidemic.model.CausaDecesso;
+import epidemic.model.Decesso;
 
 /**
  * Implementazione dei metodi di comunicazione con il database
- * per oggetti di tipo Comune
+ * per oggetti di tipo Decesso
  * 
  * @author Cristiano Di Bari
  * @author Matteo Cavaliere
  * @author Enrico Lonardi
  *
  */
-public class ComuneDAO implements DAO<Comune>{
-	
-	private static ComuneDAO istance;
+public class DecessoDAO implements DAO<Decesso> {
+
+	private static DecessoDAO istance;
 	private Properties queries;
 	
 	/**
-	 * Crea un oggetto ComuneDAO importando le query specificate nel
-	 * file comuniQueries.properties
+	 * Crea un oggetto DecessoDAO importando le query specificate nel
+	 * file decessoQueries.properties
 	 * 
 	 * @throws IOException
 	 */
-	private ComuneDAO() throws IOException {
-		InputStream queryFile = new FileInputStream("queries/comuniQueries.properties");
+	private DecessoDAO() throws IOException {
+		InputStream queryFile = new FileInputStream("queries/decessoQueries.properties");
 		queries = new Properties();
 		queries.load(queryFile);
 	}
 	
 	/**
 	 * Utilizza il pattern Singleton per assicurarsi che venga creato
-	 * un solo ComuneDAO per interagire con il database
+	 * un solo DecessoDAO per interagire con il database
 	 * 
-	 * @return l'oggetto ComuneDAO
+	 * @return l'oggetto DecessoDAO
 	 * @throws IOException
 	 */
-	public static ComuneDAO getIstance() throws IOException {
+	public static DecessoDAO getIstance() throws IOException {
 		if(istance == null)
-			istance = new ComuneDAO();
+			istance = new DecessoDAO();
 		return istance;
 	}
 	
 	/**
-	 * Restituisce un Comune nel database con uno specifico nome
+	 * Restituisce una lista di decessi nel database che appartengono ad
+	 * una specifica segnalazione
 	 * 
-	 * @param nomeComune il nome del comune da cercare
-	 * @return il comune trovato
+	 * @param id_segnalazione segnalazione da cercare
+	 * @return lista di decessi di una segnalazione
 	 */
-	public Comune getComuneDaNome(String nomeComune) {
-		Comune comune = null;
+	public List<Decesso> getAllForSegnalazione(int id_segnalazione) {
+		List<Decesso> decessi = new ArrayList<>();
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
         
         try {
         	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(queries.getProperty("nome_query"));
-            preparedStatement.setString(1, nomeComune);
+            preparedStatement = connection.prepareStatement(queries.getProperty("read_per_segnalazione_query"));
+            preparedStatement.setInt(1, id_segnalazione);
             preparedStatement.execute();
             result = preparedStatement.getResultSet();
- 
-            if (result != null && result.next())
-            	comune = getItemFromRS(result);
-           
+            
+            while(result.next())
+            	decessi.add(getItemFromRS(result));
+            
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -94,54 +92,13 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
  
-        return comune;
+        return decessi;
 	}
-	
-	/**
-	 * Restituisce una lista di Comuni nel database che sono stati assegnati
-	 * ad uno specifico utente a contratto
-	 * 
-	 * @param idUtenteContratto id dell'utente a contratto da cercare
-	 * @return lista di comuni assegnati ad un utente
-	 */
-	public ObservableList<Comune> getComuniPerResponsabile(int idUtenteContratto) {
-		ObservableList<Comune> comuni = FXCollections.observableArrayList();
-		Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet result = null;
-        
-        try {
-        	connection = MySqlDAOFactory.createConnection();
-            preparedStatement = connection.prepareStatement(queries.getProperty("comuni_di_responsabilita_query"));
-            preparedStatement.setInt(1, idUtenteContratto);
-            preparedStatement.execute();
-            result = preparedStatement.getResultSet();
- 
-            while (result.next())
-            	comuni.add(getItemFromRS(result));
-           
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                result.close();
-            } catch (Exception rse) {
-                rse.printStackTrace();
-            }
-            try {
-                preparedStatement.close();
-            } catch (Exception sse) {
-                sse.printStackTrace();
-            }
-        }
- 
-        return comuni;
-	}
+
 	
 	@Override
-	public List<Comune> getAll() {
-		List<Comune> municipalities = new ArrayList<>();
-		
+	public List<Decesso> getAll() {
+		List<Decesso> decessi = new ArrayList<>();
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -153,7 +110,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
            
             while(result.next())
-            	municipalities.add(getItemFromRS(result));
+            	decessi.add(getItemFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -170,12 +127,13 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
         
-        return municipalities;
+        return decessi;
 	}
 
+	
 	@Override
-	public Comune get(int id) {
-		Comune comune = null;
+	public Decesso get(int id) {
+		Decesso decesso = null;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -188,7 +146,7 @@ public class ComuneDAO implements DAO<Comune>{
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	comune = getItemFromRS(result);
+            	decesso = getItemFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -205,11 +163,12 @@ public class ComuneDAO implements DAO<Comune>{
             }
         }
  
-        return comune;
+        return decesso;
 	}
+	
 
 	@Override
-	public int create(Comune comune) {
+	public int create(Decesso decesso) {
 		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -218,7 +177,7 @@ public class ComuneDAO implements DAO<Comune>{
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromItem(preparedStatement, comune);
+            setPreparedStatementFromItem(preparedStatement, decesso);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -244,15 +203,15 @@ public class ComuneDAO implements DAO<Comune>{
 	}
 
 	@Override
-	public boolean update(Comune comune) {
+	public boolean update(Decesso decesso) {
 		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromItem(preparedStatement, comune);
-            preparedStatement.setInt(9, comune.getId());
+            setPreparedStatementFromItem(preparedStatement, decesso);
+            preparedStatement.setInt(4, decesso.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -268,14 +227,14 @@ public class ComuneDAO implements DAO<Comune>{
 	}
 
 	@Override
-	public boolean delete(Comune comune) {
+	public boolean delete(Decesso decesso) {
 		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
-            preparedStatement.setInt(1, comune.getId());
+            preparedStatement.setInt(1, decesso.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -289,41 +248,19 @@ public class ComuneDAO implements DAO<Comune>{
         }
 		return success;
 	}
-	
-	@Override
-	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, Comune comune) throws SQLException {
-		preparedStatement.setString(1, comune.getNome());
-        preparedStatement.setDouble(2, comune.getSuperficie());
-        preparedStatement.setString(3, comune.getIstat());
-		preparedStatement.setDate(4, comune.getDataIstituzione());
-		preparedStatement.setInt(5, comune.getTerritorio().ordinal());
-		preparedStatement.setBoolean(6, comune.getSulMare());
-		preparedStatement.setInt(7, comune.getProvinciaAppartenenza().getId());
-		preparedStatement.setInt(8, comune.getResponsabile().getId());
-	}
-	
-	@Override
-	public Comune getItemFromRS(ResultSet result) throws SQLException {
-		MySqlDAOFactory database = new MySqlDAOFactory();
-		Provincia provincia;
-		
-		try {
-			provincia = database.getProvinciaDAO().get(result.getInt("id_provincia"));
-		} catch(IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		
 
-		Comune comune = new Comune(result.getString("nome"), result.getDouble("superficie"), result.getString("istat"),
-				result.getDate("data_istituzione"), Territorio.values()[result.getInt("territorio")], result.getBoolean("mare"), provincia);
-		comune.setId(result.getInt("id"));
-		
-		return comune;
+	@Override
+	public Decesso getItemFromRS(ResultSet result) throws SQLException {
+		Decesso decesso = new Decesso(CausaDecesso.values()[result.getInt("causa")], result.getInt("numero"));
+		decesso.setId(result.getInt("id"));
+		return decesso;
 	}
 
+	@Override
+	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, Decesso decesso) throws SQLException {
+		preparedStatement.setInt(1, decesso.getCausa().ordinal());
+		preparedStatement.setInt(2, decesso.getNumero());
+		preparedStatement.setInt(3, decesso.getSegnalazione().getId());
+	}
 
 }
-
-
-

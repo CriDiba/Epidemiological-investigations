@@ -11,51 +11,54 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import epidemic.model.Regione;
+
+import epidemic.model.Decesso;
+import epidemic.model.Provincia;
+import epidemic.model.SegnalazioneDecessi;
 
 /**
  * Implementazione dei metodi di comunicazione con il database
- * per oggetti di tipo Regione
+ * per oggetti di tipo SegnalazioneDecessi
  * 
  * @author Cristiano Di Bari
  * @author Matteo Cavaliere
  * @author Enrico Lonardi
  *
  */
-public class RegioneDAO implements DAO<Regione> {
-
-	private static RegioneDAO istance;
+public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
+	
+	private static SegnalazioneDecessiDAO istance;
 	private Properties queries;
 	
 	/**
-	 * Crea un oggetto RegioneDAO importando le query specificate nel
-	 * file regioniQueries.properties
+	 * Crea un oggetto SegnalazioneDecessiDAO importando le query specificate nel
+	 * file segnalazioneDecessiQueries.properties
 	 * 
 	 * @throws IOException
 	 */
-	private RegioneDAO() throws IOException {
-		InputStream queryFile = new FileInputStream("queries/regioniQueries.properties");
+	private SegnalazioneDecessiDAO() throws IOException {
+		InputStream queryFile = new FileInputStream("queries/segnalazioneDecessiQueries.properties");
 		queries = new Properties();
 		queries.load(queryFile);
 	}
 	
 	/**
 	 * Utilizza il pattern Singleton per assicurarsi che venga creato
-	 * un solo RegioneDAO per interagire con il database
+	 * un solo SegnalazioneDecessiDAO per interagire con il database 
 	 * 
-	 * @return l'oggetto RegioneDAO
+	 * @return l'oggetto SegnalazioneDecessiDAO
 	 * @throws IOException
 	 */
-	public static RegioneDAO getIstance() throws IOException {
+	public static SegnalazioneDecessiDAO getIstance() throws IOException {
 		if(istance == null)
-			istance = new RegioneDAO();
+			istance = new SegnalazioneDecessiDAO();
 		return istance;
 	}
 	
+	
 	@Override
-	public List<Regione> getAll() {
-		List<Regione> regions = new ArrayList<>();
-		
+	public List<SegnalazioneDecessi> getAll() {
+		List<SegnalazioneDecessi> segnDecessi = new ArrayList<>();
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -67,7 +70,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
            
             while(result.next())
-	           	regions.add(getItemFromRS(result));
+            	segnDecessi.add(getItemFromRS(result));
            
         } catch (SQLException e) {
             e.printStackTrace();
@@ -84,12 +87,13 @@ public class RegioneDAO implements DAO<Regione> {
             }
         }
         
-        return regions;
+        return segnDecessi;
 	}
 
+
 	@Override
-	public Regione get(int id) {
-		Regione regione = null;
+	public SegnalazioneDecessi get(int id) {
+		SegnalazioneDecessi segnDecessi = null;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet result = null;
@@ -102,7 +106,7 @@ public class RegioneDAO implements DAO<Regione> {
             result = preparedStatement.getResultSet();
             
             if(result != null && result.next())
-            	regione = getItemFromRS(result);
+            	segnDecessi = getItemFromRS(result);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -119,11 +123,13 @@ public class RegioneDAO implements DAO<Regione> {
             }
         }
  
-        return regione;
+        return segnDecessi;
 	}
+	
+
 
 	@Override
-	public int create(Regione regione) {
+	public int create(SegnalazioneDecessi segnDecessi) {
 		int success = -1;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -132,12 +138,14 @@ public class RegioneDAO implements DAO<Regione> {
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromItem(preparedStatement, regione);           
+            setPreparedStatementFromItem(preparedStatement, segnDecessi);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
-            if (result.next() && result != null)
+            if (result.next() && result != null) {
                 success = result.getInt(1);
+                createDecessiPerSegnalazione(segnDecessi, success);
+            }
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -158,15 +166,15 @@ public class RegioneDAO implements DAO<Regione> {
 	}
 
 	@Override
-	public boolean update(Regione regione) {
+	public boolean update(SegnalazioneDecessi segnDecessi) {
 		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromItem(preparedStatement, regione);
-            preparedStatement.setInt(4, regione.getId());
+            setPreparedStatementFromItem(preparedStatement, segnDecessi);
+            preparedStatement.setInt(3, segnDecessi.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -182,14 +190,14 @@ public class RegioneDAO implements DAO<Regione> {
 	}
 
 	@Override
-	public boolean delete(Regione regione) {
+	public boolean delete(SegnalazioneDecessi segnDecessi) {
 		boolean success = false;
 		Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("delete_query"));
-            preparedStatement.setInt(1, regione.getId());
+            preparedStatement.setInt(1, segnDecessi.getId());
             preparedStatement.execute();
             success = true;
         } catch (SQLException e) {
@@ -205,17 +213,53 @@ public class RegioneDAO implements DAO<Regione> {
 	}
 	
 	@Override
-	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, Regione regione) throws SQLException {
-		 preparedStatement.setString(1, regione.getNome());
-         preparedStatement.setDouble(2, regione.getSuperficie());
-         preparedStatement.setString(3, regione.getCapoluogo());
-	}
+	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, SegnalazioneDecessi segnDecessi) throws SQLException {
+		preparedStatement.setDate(1, segnDecessi.getData());
+		preparedStatement.setInt(2, segnDecessi.getProvinciaRiferimento().getId());
+	}	
 	
 	@Override
-	public Regione getItemFromRS(ResultSet result) throws SQLException {
-		Regione regione = new Regione(result.getString("nome"), result.getDouble("superficie"), result.getString("capoluogo"));
-		regione.setId(result.getInt("id"));
-		return regione;
+	public SegnalazioneDecessi getItemFromRS(ResultSet result) throws SQLException {
+		MySqlDAOFactory database = new MySqlDAOFactory();
+		List<Decesso> listaDecessi = new ArrayList<>();
+		
+		Provincia provincia = null;
+		try {
+			listaDecessi = database.getDecessoDAO().getAllForSegnalazione(result.getInt("id"));			
+			provincia = database.getProvinciaDAO().get(result.getInt("id_comune"));
+		} catch(IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return new SegnalazioneDecessi(listaDecessi, result.getDate("data"), provincia);
 	}
+	
+	/**
+	 * Crea nel database i decessi relativi ad una determinata segnalazione di decessi
+	 * 
+	 * @param segnDecessi la segnalazione di decessi
+	 * @param success id della segnalazione di decessi
+	 */
+	private void createDecessiPerSegnalazione(SegnalazioneDecessi segnDecessi, int success) {
+		MySqlDAOFactory database = new MySqlDAOFactory();
+		DecessoDAO decessoDAO;
+		
+		try {
+			decessoDAO = database.getDecessoDAO();
+		} catch(IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		segnDecessi.setId(success);
+        
+        for(Decesso decesso: segnDecessi.getDecessi()) {
+        	decesso.setSegnalazione(segnDecessi);
+        	decessoDAO.create(decesso);
+        }
+		
+	}
+	
 
 }

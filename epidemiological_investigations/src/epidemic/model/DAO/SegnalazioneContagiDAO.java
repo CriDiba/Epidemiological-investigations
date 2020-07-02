@@ -16,22 +16,51 @@ import epidemic.model.Comune;
 import epidemic.model.Contagio;
 import epidemic.model.SegnalazioneContagi;
 
+/**
+ * Implementazione dei metodi di comunicazione con il database
+ * per oggetti di tipo SegnalazioneContagi
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 	private static SegnalazioneContagiDAO istance;
 	private Properties queries;
 	
+	/**
+	 * Crea un oggetto SegnalazioneContagiDAO importando le query specificate nel
+	 * file segnalazioneContagiQueries.properties
+	 * 
+	 * @throws IOException
+	 */
 	private SegnalazioneContagiDAO() throws IOException {
 		InputStream queryFile = new FileInputStream("queries/segnalazioneContagiQueries.properties");
 		queries = new Properties();
 		queries.load(queryFile);
 	}
 	
+	/**
+	 * Utilizza il pattern Singleton per assicurarsi che venga creato
+	 * un solo SegnalazioneContagiDAO per interagire con il database 
+	 * 
+	 * @return l'oggetto SegnalazioneContagiDAO
+	 * @throws IOException
+	 */
 	public static SegnalazioneContagiDAO getIstance() throws IOException {
 		if(istance == null)
 			istance = new SegnalazioneContagiDAO();
 		return istance;
 	}
 	
+	/**
+	 * Ritorna l'ultima (più recente) segnalazione di contagio
+	 * presente nel database per un determinato comune
+	 * 
+	 * @param comune comune da ricercare
+	 * @return ultima segnalazione effettuata per un comune
+	 */
 	public SegnalazioneContagi getLastForComune(Comune comune) {
 		SegnalazioneContagi segnContagi = null;
 		Connection connection = null;
@@ -147,7 +176,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
         try {
             connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("create_query"), Statement.RETURN_GENERATED_KEYS);
-            setPreparedStatementFromSegnalazione(preparedStatement, segnContagi);
+            setPreparedStatementFromItem(preparedStatement, segnContagi);
             preparedStatement.execute();
             result = preparedStatement.getGeneratedKeys();
             
@@ -182,7 +211,7 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
         try {
         	connection = MySqlDAOFactory.createConnection();
             preparedStatement = connection.prepareStatement(queries.getProperty("update_query"));
-            setPreparedStatementFromSegnalazione(preparedStatement, segnContagi);
+            setPreparedStatementFromItem(preparedStatement, segnContagi);
             preparedStatement.setInt(3, segnContagi.getId());
             preparedStatement.execute();
             success = true;
@@ -221,11 +250,13 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 		return success;
 	}
 	
-	private void setPreparedStatementFromSegnalazione(PreparedStatement preparedStatement, SegnalazioneContagi segnContagi) throws SQLException {
+	@Override
+	public void setPreparedStatementFromItem(PreparedStatement preparedStatement, SegnalazioneContagi segnContagi) throws SQLException {
 		preparedStatement.setDate(1, segnContagi.getData());
 		preparedStatement.setInt(2, segnContagi.getComuneRiferimento().getId());
 	}
 	
+	@Override
 	public SegnalazioneContagi getItemFromRS(ResultSet result) throws SQLException {
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		List<Contagio> listaContagi = new ArrayList<>();
@@ -243,6 +274,12 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 		return segnalazione;
 	}
 	
+	/**
+	 * Crea nel database i contagi relativi ad una determinata segnalazione di contagio
+	 * 
+	 * @param segnContagi la segnalazione di contagio
+	 * @param success id della segnalazione di contagio
+	 */
 	private void createContagiPerSegnalazione(SegnalazioneContagi segnContagi, int success) {
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		ContagioDAO contagioDAO;
@@ -264,3 +301,4 @@ public class SegnalazioneContagiDAO implements DAO<SegnalazioneContagi> {
 	}
 
 }
+
