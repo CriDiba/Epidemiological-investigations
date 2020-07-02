@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -299,7 +300,10 @@ public class ComuneDAO implements DAO<Comune>{
 		preparedStatement.setInt(5, comune.getTerritorio().ordinal());
 		preparedStatement.setBoolean(6, comune.getSulMare());
 		preparedStatement.setInt(7, comune.getProvinciaAppartenenza().getId());
-		preparedStatement.setInt(8, comune.getResponsabile().getId());
+		if(comune.getResponsabile() != null)
+			preparedStatement.setInt(8, comune.getResponsabile().getId());
+		else
+			preparedStatement.setNull(8, Types.INTEGER);
 	}
 	
 	@Override

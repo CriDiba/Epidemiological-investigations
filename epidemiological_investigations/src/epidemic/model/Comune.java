@@ -14,10 +14,10 @@ import java.util.List;
  *
  */
 public class Comune extends Localita {
-	private final String istat;
-	private final Date dataIstituzione;
-	private final Territorio territorio;
-	private final boolean sulMare;
+	private String istat;
+	private Date dataIstituzione;
+	private Territorio territorio;
+	private boolean sulMare;
 	private final Provincia provinciaAppartenenza;
 	private Contratto responsabile;
 	private List<SegnalazioneContagi> segnalazioniContagi;
@@ -67,16 +67,32 @@ public class Comune extends Localita {
 		return istat;
 	}
 	
+	public void setIstat(String istat) {
+		this.istat = istat;
+	}
+	
 	public Date getDataIstituzione() {
 		return dataIstituzione;
+	}
+	
+	public void setDataIstituzione(Date dataIstituzione) {
+		this.dataIstituzione = dataIstituzione;
 	}
 
 	public Territorio getTerritorio() {
 		return territorio;
 	}
+	
+	public void setTerritorio(Territorio territorio) {
+		this.territorio = territorio;
+	}
 
 	public boolean getSulMare() {
 		return sulMare;
+	}
+	
+	public void setSulMare(boolean sulMare) {
+		this.sulMare = sulMare;
 	}
 
 	public Provincia getProvinciaAppartenenza() {

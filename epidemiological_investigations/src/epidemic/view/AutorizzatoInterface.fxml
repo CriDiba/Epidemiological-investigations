@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -12,8 +13,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="epidemic.controller.AutorizzatoInterfaceController">
    <children>
@@ -27,8 +30,11 @@
                            <VBox.margin>
                               <Insets bottom="20.0" top="20.0" />
                            </VBox.margin>
+                           <font>
+                              <Font size="15.0" />
+                           </font>
                         </Label>
-                        <ComboBox fx:id="comboRegione" prefHeight="26.0" prefWidth="195.0" promptText="Seleziona regione" />
+                        <ComboBox fx:id="comboRegione" onAction="#handleSceltaRegione" prefHeight="26.0" prefWidth="195.0" promptText="Seleziona regione" />
                      </children>
                   </VBox>
                   <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
@@ -49,19 +55,25 @@
                               <Label alignment="CENTER" contentDisplay="TOP" prefWidth="298.0" text="Nome" />
                               <TextField fx:id="textRegNome" prefHeight="20.0" prefWidth="280.0" GridPane.rowIndex="1" />
                               <TextField fx:id="textRegCapoluogo" prefHeight="20.0" prefWidth="280.0" GridPane.rowIndex="5" />
-                              <TextField fx:id="textRegSuperficie" prefHeight="20.0" prefWidth="280.0" GridPane.rowIndex="3" />
                               <Label alignment="CENTER" prefHeight="39.0" prefWidth="255.0" text="Superficie" GridPane.rowIndex="2" />
                               <Label alignment="CENTER" prefHeight="26.0" prefWidth="255.0" text="Capoluogo" GridPane.rowIndex="4" />
+                              <Spinner fx:id="spinRegSuperficie" editable="true" prefHeight="25.0" prefWidth="273.0" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                      </children>
                   </AnchorPane>
                   <ButtonBar prefHeight="75.0" prefWidth="259.0">
                     <buttons>
-                      <Button alignment="CENTER" mnemonicParsing="false" text="Add" />
-                        <Button mnemonicParsing="false" text="Save" />
-                        <Button mnemonicParsing="false" text="Delete" />
+                      <Button fx:id="btnAddRegione" alignment="CENTER" minWidth="74.0" mnemonicParsing="false" onAction="#handleAddRegione" prefHeight="25.0" prefWidth="96.0" text="Nuovo" />
+                        <Button fx:id="btnEditRegione" mnemonicParsing="false" onAction="#handleEditRegione" prefHeight="25.0" prefWidth="80.0" text="Modifica" />
+                        <Button fx:id="btnDeleteRegione" alignment="CENTER" contentDisplay="TOP" mnemonicParsing="false" onAction="#handleDeleteRegione" text="Elimina" textAlignment="CENTER" />
                     </buttons>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets right="15.0" />
+                     </VBox.margin>
                   </ButtonBar>
                </children>
             </VBox>
@@ -69,36 +81,58 @@
               <items>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
-                          <buttons>
-                            <Button mnemonicParsing="false" text="Button" />
-                          </buttons>
-                        </ButtonBar>
-                        <TableView fx:id="tableProvince" prefHeight="365.0" prefWidth="695.0">
+                        <HBox>
+                           <children>
+                              <Label alignment="CENTER" prefHeight="32.0" prefWidth="122.0" text="PROVINCE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <ButtonBar fx:id="btnProvincia" prefHeight="32.0" prefWidth="580.0">
+                                <buttons>
+                                  <Button mnemonicParsing="false" onAction="#handleAddProvincia" text="Nuovo" />
+                                    <Button mnemonicParsing="false" onAction="#handleEditProvincia" text="Modifica" />
+                                    <Button mnemonicParsing="false" onAction="#handleDeleteProvincia" text="Elimina" />
+                                </buttons>
+                              </ButtonBar>
+                           </children>
+                        </HBox>
+                        <TableView fx:id="tableProvince" onMouseClicked="#handleSceltaProvincia" prefHeight="365.0" prefWidth="695.0">
                           <columns>
                             <TableColumn fx:id="colProvNome" prefWidth="229.0" text="Provincia" />
                             <TableColumn fx:id="colProvSuperficie" prefWidth="251.0" text="Superficie" />
-                              <TableColumn fx:id="colProvCapoluogo" prefWidth="91.0" text="Capoluogo" />
+                              <TableColumn fx:id="colProvCapoluogo" prefWidth="231.0" text="Capoluogo" />
                           </columns>
                         </TableView>
                      </children>
                   </VBox>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
-                          <buttons>
-                            <Button mnemonicParsing="false" text="Button" />
-                          </buttons>
-                        </ButtonBar>
+                        <HBox>
+                           <children>
+                              <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="36.0" prefWidth="98.0" text="COMUNI">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <ButtonBar fx:id="btnComune" prefHeight="30.0" prefWidth="603.0">
+                                <buttons>
+                                  <Button mnemonicParsing="false" onAction="#handleAddComune" text="Nuovo" />
+                                    <Button mnemonicParsing="false" onAction="#handleEditComune" text="Modifica" />
+                                    <Button mnemonicParsing="false" onAction="#handleDeleteComune" text="Elimina" />
+                                </buttons>
+                              </ButtonBar>
+                           </children>
+                        </HBox>
                         <TableView fx:id="tableComuni" prefHeight="373.0" prefWidth="695.0">
                           <columns>
-                            <TableColumn fx:id="colComNome" prefWidth="105.0" text="Comune" />
-                            <TableColumn fx:id="colComSuperficie" prefWidth="97.0" text="Superficie" />
-                              <TableColumn fx:id="colComISTAT" prefWidth="111.0" text="Cod. ISTAT" />
-                              <TableColumn fx:id="colComIstituzione" prefWidth="97.0" text="Istituzione" />
-                              <TableColumn fx:id="colComTerritorio" prefWidth="93.0" text="Territorio" />
-                              <TableColumn fx:id="colComMare" prefWidth="83.0" text="Mare" />
-                              <TableColumn fx:id="colComResponsabile" prefWidth="109.0" text="Responsabile" />
+                            <TableColumn fx:id="colComNome" prefWidth="139.0" text="Comune" />
+                            <TableColumn fx:id="colComSuperficie" prefWidth="95.0" text="Superficie" />
+                              <TableColumn fx:id="colComISTAT" prefWidth="79.0" text="Cod. ISTAT" />
+                              <TableColumn fx:id="colComIstituzione" prefWidth="126.0" text="Istituzione" />
+                              <TableColumn fx:id="colComTerritorio" prefWidth="82.0" text="Territorio" />
+                              <TableColumn fx:id="colComMare" prefWidth="65.0" text="Mare" />
+                              <TableColumn fx:id="colComResponsabile" prefWidth="125.0" text="Responsabile" />
                           </columns>
                         </TableView>
                      </children>

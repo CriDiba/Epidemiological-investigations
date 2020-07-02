@@ -81,5 +81,10 @@ public abstract class Utente {
     public void setRuolo(Ruolo ruolo) {
     	this.ruolo = ruolo;
     }
+    
+    @Override
+    public String toString() {
+    	return this.nome + " " + this.cognome;
+    }
  
 }

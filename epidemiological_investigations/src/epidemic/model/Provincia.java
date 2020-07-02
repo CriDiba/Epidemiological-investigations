@@ -52,4 +52,9 @@ public class Provincia extends Localita {
 		return regioneAppartenenza;
 	}	
 	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof Provincia) && ((Provincia)obj).getId() == this.getId();
+	}
+	
 }

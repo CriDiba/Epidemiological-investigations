@@ -93,6 +93,45 @@ public class UtenteDAO implements DAO<Utente>{
         return utente;
     }
     
+	/**
+	 * Restituisce l'elenco del personale a Contratto
+	 * 
+	 * @return l'oggetto utente trovato
+	 */
+    public List<Contratto> getContratto() {
+    	List<Contratto> users = new ArrayList<Contratto>();
+		Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet result = null;
+        
+        try {
+        	connection = MySqlDAOFactory.createConnection();
+            preparedStatement = connection.prepareStatement(queries.getProperty("contratto_query"));
+            preparedStatement.setInt(1, Ruolo.CONTRATTO.ordinal());
+            preparedStatement.execute();
+            result = preparedStatement.getResultSet();
+            
+            while (result.next())
+            	users.add((Contratto) getItemFromRS(result));
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                result.close();
+            } catch (Exception rse) {
+                rse.printStackTrace();
+            }
+            try {
+                preparedStatement.close();
+            } catch (Exception sse) {
+                sse.printStackTrace();
+            }
+        }
+ 
+        return users;
+    }
+    
 
 	@Override
 	public List<Utente> getAll() {

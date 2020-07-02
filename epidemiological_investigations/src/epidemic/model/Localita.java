@@ -24,8 +24,6 @@ public abstract class Localita {
 		if(!isValid(nome) || superficie < 0)
 			throw new IllegalArgumentException();
 		
-		
-			
 		this.nome = nome;
 		this.superficie = superficie;
 	}

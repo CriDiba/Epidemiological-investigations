@@ -32,4 +32,15 @@ public class Regione extends Localita{
 	public void setCapoluogo(String capoluogo) {
 		this.capoluogo = capoluogo;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof Regione) && ((Regione)obj).getId() == this.getId();
+	}
+	
+	@Override
+	public String toString() {
+		return this.getNome();
+	}
+	
 }
