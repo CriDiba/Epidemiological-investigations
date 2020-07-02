@@ -34,7 +34,13 @@ public class LoginController {
 		this.mainReference = mainReference;
 	}
 	
-	
+	/**
+	 * Metodo che apre l'interfaccia relativa al
+	 * tipo di utente che sta facendo login
+	 * 
+	 * @param e
+	 * @throws IOException
+	 */
 	@FXML
 	public void handleLogin(ActionEvent e) throws IOException {
 		
@@ -42,7 +48,7 @@ public class LoginController {
 		
 		MySqlDAOFactory database = new MySqlDAOFactory();
 		
-    	Utente utente = database.getUtenteDAO().getUsername(username.getText());
+		Utente utente = database.getUtenteDAO().getUsername(username.getText());
     	
     	if(utente != null && toHash(password.getText()).equals(utente.getPassword())) {
     		switch(utente.getRuolo()) {
@@ -66,7 +72,14 @@ public class LoginController {
 		
 	}
 	
-	
+	/**
+	 * Funzione che calcola l'hash di
+	 * una stringa di testo, in particolare
+	 * viene usata per salvare le password in maniera sicura
+	 *  
+	 * @param text
+	 * @return hash testo dopo essere stato modificato
+	 */
 	public static String toHash(String text) {
         String hash = null;
         try {
@@ -80,7 +93,11 @@ public class LoginController {
         return hash;
     }
 	
-	
+	/**
+	 * Metodo che carica l'interfaccia per gli admin
+	 * 
+	 * @throws IOException
+	 */
 	private void adminInterface() throws IOException{
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainClass.class.getResource("/epidemic/view/AdminInterface.fxml"));
@@ -88,6 +105,13 @@ public class LoginController {
 		mainReference.getPrimaryStage().setScene(scene);
 	}
 	
+	/**
+	 * Metodo che carica l'interfaccia per il personale
+	 * a contratto
+	 * 
+	 * @param idUtenteContratto per gestire i comuni di responsabilità
+	 * @throws IOException
+	 */
 	private void contrattoInterface(int idUtenteContratto) throws IOException{
 		idUtente = idUtenteContratto;
 		FXMLLoader loader = new FXMLLoader();
@@ -96,6 +120,12 @@ public class LoginController {
 		mainReference.getPrimaryStage().setScene(scene);
 	}
 	
+	/**
+	 * Metodo che carica l'interfaccia per gli utenti
+	 * autorizzati dell'ente
+	 * 
+	 * @throws IOException
+	 */
 	private void autorizzatoInterface() throws IOException{
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainClass.class.getResource("/epidemic/view/AutorizzatoInterface.fxml"));
@@ -103,7 +133,13 @@ public class LoginController {
 		mainReference.getPrimaryStage().setScene(scene);
 	}
 	
-	
+	/**
+	 * Metodo che viene utilizzato dall'interfaccia
+	 * ContrattoInterfaceController per caricare i comuni
+	 * di responsabilità per l'utente con ID 'idUtente'
+	 * 
+	 * @return idUtente
+	 */
 	public static int getIdSession() {
 		return idUtente;
 	}

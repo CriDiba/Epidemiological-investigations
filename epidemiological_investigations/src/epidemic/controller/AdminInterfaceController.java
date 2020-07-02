@@ -56,9 +56,8 @@ public class AdminInterfaceController implements Initializable {
     private ObservableList<Utente> listaUtenti = FXCollections.observableArrayList();
 
     /**
-     * initialize is the first method to be invoked
-     * it initializes the columns and set the values of
-     * the combobox
+     * Metodo che inizializza la tabella
+     * e le combobox dell'interfaccia
      */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -78,7 +77,9 @@ public class AdminInterfaceController implements Initializable {
 	}
 	
 	/**
-	 * handles the click on Add button
+	 * Metodo che gestisce l'aggiunta di 
+	 * un nuovo utente
+	 * 
 	 * @throws IOException 
 	 */
 	public void handleAddUser() throws IOException {
@@ -109,6 +110,14 @@ public class AdminInterfaceController implements Initializable {
     	clearTextFields();
     }
 	
+	/**
+	 * Funzione che calcola l'hash di
+	 * una stringa di testo, in particolare
+	 * viene usata per salvare le password in maniera sicura
+	 * 
+	 * @param text
+	 * @return hash testo dopo essere stato modificato
+	 */
 	public static String toHash(String text) {
         String hash = null;
         try {
@@ -123,8 +132,9 @@ public class AdminInterfaceController implements Initializable {
     }
 	
 	/**
-	 * checks if the username already exists or if any of the fields are empty or blank
-	 * @return
+	 * Metodo che controlla se l'input lato utente è valido
+	 * 
+	 * @return true se l'input è ben formato
 	 */
 	private boolean inputIsValid() {
 		for(Utente utente: listaUtenti)
@@ -140,7 +150,8 @@ public class AdminInterfaceController implements Initializable {
 	}
 	
 	/**
-	 * delete selected rows of the table
+	 * Metodo che elimina le righe selezionate della tabella
+	 * 
 	 * @throws IOException 
 	 */
 	public void handleDeleteSelected() throws IOException {
@@ -160,7 +171,12 @@ public class AdminInterfaceController implements Initializable {
         clearTextFields();
 	}
 	
-	
+	/**
+	 * Metodo che gestisce la modifica
+	 * degli utenti
+	 * 
+	 * @throws IOException
+	 */
 	public void handleEditUser() throws IOException {
 
 		Utente utente = tableView.getSelectionModel().getSelectedItem();
@@ -178,7 +194,12 @@ public class AdminInterfaceController implements Initializable {
 		tableView.refresh();
 	}
 	
-	
+	/**
+	 * Metodo che carica nelle combobox e nei campi testo
+	 * l'utente selezionato dalla tabella
+	 * 
+	 * @param event
+	 */
 	public void getSelected(MouseEvent event) {
 		
 		Utente utente = tableView.getSelectionModel().getSelectedItem();
@@ -193,7 +214,7 @@ public class AdminInterfaceController implements Initializable {
 	
 	
 	/**
-	 * clears textfields
+	 * Metodo che svuota i campi testo
 	 */
 	public void clearTextFields() {
 		textNome.clear();
@@ -203,7 +224,7 @@ public class AdminInterfaceController implements Initializable {
 	}
 	
 	/**
-	 * initialize table columns contents
+	 * Metodo che inizializza le colonne della tabella
 	 */
 	private void initTableCols() {
 		colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
