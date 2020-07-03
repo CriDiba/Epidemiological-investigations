@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Lug 03, 2020 alle 10:08
+-- Creato il: Lug 03, 2020 alle 12:03
 -- Versione del server: 10.4.13-MariaDB
 -- Versione PHP: 7.4.7
 
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `comuni` (
   `id` int(10) NOT NULL,
   `nome` varchar(30) NOT NULL,
-  `superficie` decimal(10,6) NOT NULL,
+  `superficie` decimal(12,2) NOT NULL,
   `istat` varchar(10) NOT NULL,
   `data_istituzione` date NOT NULL,
   `territorio` int(1) NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE `decessi` (
 CREATE TABLE `province` (
   `id` int(10) NOT NULL,
   `nome` varchar(30) NOT NULL,
-  `superficie` decimal(10,6) NOT NULL,
+  `superficie` decimal(12,2) NOT NULL,
   `capoluogo` varchar(30) NOT NULL,
   `id_regione` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -89,7 +89,7 @@ CREATE TABLE `province` (
 CREATE TABLE `regioni` (
   `id` int(10) NOT NULL,
   `nome` varchar(30) NOT NULL,
-  `superficie` decimal(10,6) NOT NULL,
+  `superficie` decimal(12,2) NOT NULL,
   `capoluogo` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -227,13 +227,13 @@ ALTER TABLE `decessi`
 -- AUTO_INCREMENT per la tabella `province`
 --
 ALTER TABLE `province`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT per la tabella `regioni`
 --
 ALTER TABLE `regioni`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT per la tabella `segnalazioni_contagi`
