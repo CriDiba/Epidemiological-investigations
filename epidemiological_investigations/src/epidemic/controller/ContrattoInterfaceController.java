@@ -277,7 +277,7 @@ public class ContrattoInterfaceController implements Initializable {
 	 */
 	private boolean dateIsValid(Date dataOggi, Comune comuneRiferimento) throws IOException {
 		SegnalazioneContagi ultimaSegnalazione = database.getSegnalazioneContagiDAO().getLastForComune(comuneRiferimento);
-		if(dataOggi.getTime() < ultimaSegnalazione.getData().getTime() + WEEK_MS)
+		if(ultimaSegnalazione != null && dataOggi.getTime() < ultimaSegnalazione.getData().getTime() + WEEK_MS)
 			return false;
 		return true;
 	}
@@ -356,6 +356,15 @@ public class ContrattoInterfaceController implements Initializable {
 		List<SegnalazioneContagi> tutteSegnalazioni = database.getSegnalazioneContagiDAO().getAll();
 		
 		mappaComuneSegnalazioni.put(tuttiComuni, new ArrayList<>());
+		
+		if(tutteSegnalazioni.isEmpty()) {
+			for(Comune comune: listaComuniResponsabilita) {
+				mappaComuneSegnalazioni.put(comune, new ArrayList<>());
+				nomiComuniResponsabilita.add(comune.getNome());
+			}
+			return;
+		}
+		
 		for(Comune comune: listaComuniResponsabilita) {
 			nomiComuniResponsabilita.add(comune.getNome());
 			for(SegnalazioneContagi s: tutteSegnalazioni)
