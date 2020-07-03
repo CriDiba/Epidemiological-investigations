@@ -190,7 +190,7 @@ public class AutorizzatoInterfaceController {
 		if(insertRegioneMode) {
 			if (isInputValid()) {
 				Regione nuovaRegione = new Regione(textRegNome.getText(), spinRegSuperficie.getValue(), textRegCapoluogo.getText());
-				database.getRegioneDAO().create(nuovaRegione);
+				nuovaRegione.setId(database.getRegioneDAO().create(nuovaRegione));
 				listaRegioni.add(nuovaRegione);
 				comboRegione.setValue(nuovaRegione);
 				comboRegione.setDisable(false);
@@ -270,7 +270,7 @@ public class AutorizzatoInterfaceController {
 	private void handleAddProvincia() throws IOException {
 	    boolean salvaClicked = showProvinciaEditDialog(null);
 	    if (salvaClicked) {
-	        database.getProvinciaDAO().create(provinciaSelezionata);
+	        provinciaSelezionata.setId(database.getProvinciaDAO().create(provinciaSelezionata));
 	        tableProvince.getItems().add(provinciaSelezionata);
 	    }
 	}
@@ -321,7 +321,7 @@ public class AutorizzatoInterfaceController {
 	private void handleAddComune() throws IOException {
 	    boolean salvaClicked = showComuneEditDialog(null);
 	    if (salvaClicked) {
-	        database.getComuneDAO().create(comuneSelezionato);
+	        comuneSelezionato.setId(database.getComuneDAO().create(comuneSelezionato));
 	        tableComuni.getItems().add(comuneSelezionato);
 	    }
 	}
