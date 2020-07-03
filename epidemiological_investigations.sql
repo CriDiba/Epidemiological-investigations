@@ -2,10 +2,10 @@
 -- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: May 31, 2020 at 11:13 AM
--- Server version: 10.4.11-MariaDB
--- PHP Version: 7.4.5
+-- Host: 127.0.0.1
+-- Creato il: Lug 03, 2020 alle 10:08
+-- Versione del server: 10.4.13-MariaDB
+-- Versione PHP: 7.4.7
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `comuni`
+-- Struttura della tabella `comuni`
 --
 
 CREATE TABLE `comuni` (
@@ -42,7 +42,7 @@ CREATE TABLE `comuni` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `contagi`
+-- Struttura della tabella `contagi`
 --
 
 CREATE TABLE `contagi` (
@@ -56,7 +56,7 @@ CREATE TABLE `contagi` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `decessi`
+-- Struttura della tabella `decessi`
 --
 
 CREATE TABLE `decessi` (
@@ -69,10 +69,10 @@ CREATE TABLE `decessi` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `provincie`
+-- Struttura della tabella `province`
 --
 
-CREATE TABLE `provincie` (
+CREATE TABLE `province` (
   `id` int(10) NOT NULL,
   `nome` varchar(30) NOT NULL,
   `superficie` decimal(10,6) NOT NULL,
@@ -83,7 +83,7 @@ CREATE TABLE `provincie` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `regioni`
+-- Struttura della tabella `regioni`
 --
 
 CREATE TABLE `regioni` (
@@ -96,7 +96,7 @@ CREATE TABLE `regioni` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `segnalazioni_contagi`
+-- Struttura della tabella `segnalazioni_contagi`
 --
 
 CREATE TABLE `segnalazioni_contagi` (
@@ -108,7 +108,7 @@ CREATE TABLE `segnalazioni_contagi` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `segnalazioni_decessi`
+-- Struttura della tabella `segnalazioni_decessi`
 --
 
 CREATE TABLE `segnalazioni_decessi` (
@@ -120,7 +120,7 @@ CREATE TABLE `segnalazioni_decessi` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `utenti`
+-- Struttura della tabella `utenti`
 --
 
 CREATE TABLE `utenti` (
@@ -133,18 +133,18 @@ CREATE TABLE `utenti` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `utenti`
+-- Dump dei dati per la tabella `utenti`
 --
 
 INSERT INTO `utenti` (`id`, `nome`, `cognome`, `username`, `password`, `ruolo`) VALUES
 (1, 'admin', 'admin', 'admin', '-7396891a4abefbea4216f742b211ea204e9856378c03b44757e090d54bb756e8', 0);
 
 --
--- Indexes for dumped tables
+-- Indici per le tabelle scaricate
 --
 
 --
--- Indexes for table `comuni`
+-- Indici per le tabelle `comuni`
 --
 ALTER TABLE `comuni`
   ADD PRIMARY KEY (`id`),
@@ -152,147 +152,147 @@ ALTER TABLE `comuni`
   ADD KEY `id_responsabile` (`id_responsabile`);
 
 --
--- Indexes for table `contagi`
+-- Indici per le tabelle `contagi`
 --
 ALTER TABLE `contagi`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_segnalazione` (`id_segnalazione`);
 
 --
--- Indexes for table `decessi`
+-- Indici per le tabelle `decessi`
 --
 ALTER TABLE `decessi`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_segnalazione` (`id_segnalazione`);
 
 --
--- Indexes for table `provincie`
+-- Indici per le tabelle `province`
 --
-ALTER TABLE `provincie`
+ALTER TABLE `province`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nome` (`nome`),
   ADD KEY `id_regione` (`id_regione`);
 
 --
--- Indexes for table `regioni`
+-- Indici per le tabelle `regioni`
 --
 ALTER TABLE `regioni`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nome` (`nome`);
 
 --
--- Indexes for table `segnalazioni_contagi`
+-- Indici per le tabelle `segnalazioni_contagi`
 --
 ALTER TABLE `segnalazioni_contagi`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_comune` (`id_comune`);
 
 --
--- Indexes for table `segnalazioni_decessi`
+-- Indici per le tabelle `segnalazioni_decessi`
 --
 ALTER TABLE `segnalazioni_decessi`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_provincia` (`id_provincia`);
 
 --
--- Indexes for table `utenti`
+-- Indici per le tabelle `utenti`
 --
 ALTER TABLE `utenti`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT per le tabelle scaricate
 --
 
 --
--- AUTO_INCREMENT for table `comuni`
+-- AUTO_INCREMENT per la tabella `comuni`
 --
 ALTER TABLE `comuni`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `contagi`
+-- AUTO_INCREMENT per la tabella `contagi`
 --
 ALTER TABLE `contagi`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `decessi`
+-- AUTO_INCREMENT per la tabella `decessi`
 --
 ALTER TABLE `decessi`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `provincie`
+-- AUTO_INCREMENT per la tabella `province`
 --
-ALTER TABLE `provincie`
+ALTER TABLE `province`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `regioni`
+-- AUTO_INCREMENT per la tabella `regioni`
 --
 ALTER TABLE `regioni`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `segnalazioni_contagi`
+-- AUTO_INCREMENT per la tabella `segnalazioni_contagi`
 --
 ALTER TABLE `segnalazioni_contagi`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `segnalazioni_decessi`
+-- AUTO_INCREMENT per la tabella `segnalazioni_decessi`
 --
 ALTER TABLE `segnalazioni_decessi`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `utenti`
+-- AUTO_INCREMENT per la tabella `utenti`
 --
 ALTER TABLE `utenti`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- Constraints for dumped tables
+-- Limiti per le tabelle scaricate
 --
 
 --
--- Constraints for table `comuni`
+-- Limiti per la tabella `comuni`
 --
 ALTER TABLE `comuni`
-  ADD CONSTRAINT `id_provincia` FOREIGN KEY (`id_provincia`) REFERENCES `provincie` (`id`),
-  ADD CONSTRAINT `id_responsabile` FOREIGN KEY (`id_responsabile`) REFERENCES `utenti` (`id`);
+  ADD CONSTRAINT `id_provincia` FOREIGN KEY (`id_provincia`) REFERENCES `province` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `id_responsabile` FOREIGN KEY (`id_responsabile`) REFERENCES `utenti` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `contagi`
+-- Limiti per la tabella `contagi`
 --
 ALTER TABLE `contagi`
   ADD CONSTRAINT `id_segnalazione` FOREIGN KEY (`id_segnalazione`) REFERENCES `segnalazioni_contagi` (`id`);
 
 --
--- Constraints for table `decessi`
+-- Limiti per la tabella `decessi`
 --
 ALTER TABLE `decessi`
   ADD CONSTRAINT `decessi_ibfk_1` FOREIGN KEY (`id_segnalazione`) REFERENCES `segnalazioni_decessi` (`id`);
 
 --
--- Constraints for table `provincie`
+-- Limiti per la tabella `province`
 --
-ALTER TABLE `provincie`
-  ADD CONSTRAINT `provincie_ibfk_1` FOREIGN KEY (`id_regione`) REFERENCES `regioni` (`id`) ON DELETE CASCADE;
+ALTER TABLE `province`
+  ADD CONSTRAINT `province_ibfk_1` FOREIGN KEY (`id_regione`) REFERENCES `regioni` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `segnalazioni_contagi`
+-- Limiti per la tabella `segnalazioni_contagi`
 --
 ALTER TABLE `segnalazioni_contagi`
   ADD CONSTRAINT `id_comune` FOREIGN KEY (`id_comune`) REFERENCES `comuni` (`id`);
 
 --
--- Constraints for table `segnalazioni_decessi`
+-- Limiti per la tabella `segnalazioni_decessi`
 --
 ALTER TABLE `segnalazioni_decessi`
-  ADD CONSTRAINT `segnalazioni_decessi_ibfk_1` FOREIGN KEY (`id_provincia`) REFERENCES `provincie` (`id`);
+  ADD CONSTRAINT `segnalazioni_decessi_ibfk_1` FOREIGN KEY (`id_provincia`) REFERENCES `province` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
