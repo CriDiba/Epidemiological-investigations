@@ -156,15 +156,15 @@ public class AdminInterfaceController implements Initializable {
 	 */
 	public void handleDeleteSelected() throws IOException {
 		Utente utente = tableView.getSelectionModel().getSelectedItem();
-        if (utente != null) {
+        if (utente != null && !utente.getRuolo().equals(Ruolo.ADMIN)) {
     		database.getUtenteDAO().delete(utente);
         	tableView.getItems().remove(utente);
         } else {
             // Nothing selected.
             Alert alert = new Alert(AlertType.WARNING);
-            alert.setTitle("No Selection");
-            alert.setHeaderText("No Person Selected");
-            alert.setContentText("Please select a person in the table.");
+            alert.setTitle("Eliminazione fallita");
+            alert.setHeaderText("Selezione non valida");
+            alert.setContentText("Selezionare un utente (non ADMIN) da eliminare!");
             alert.showAndWait();
         }
         
@@ -180,18 +180,26 @@ public class AdminInterfaceController implements Initializable {
 	public void handleEditUser() throws IOException {
 
 		Utente utente = tableView.getSelectionModel().getSelectedItem();
-
-		utente.setNome(textNome.getText());
-		utente.setCognome(textCognome.getText());
-		utente.setUsername(textUsername.getText());
-		utente.setRuolo(comboRuolo.getValue());
 		
-		if(utente.getPassword() != textPassword.getText())
-			utente.setPassword(toHash(textPassword.getText()));
-	
-		database.getUtenteDAO().update(utente);
+		if(!utente.getRuolo().equals(Ruolo.ADMIN)) {
+			utente.setNome(textNome.getText());
+			utente.setCognome(textCognome.getText());
+			utente.setUsername(textUsername.getText());
+			utente.setRuolo(comboRuolo.getValue());
+			
+			if(utente.getPassword() != textPassword.getText())
+				utente.setPassword(toHash(textPassword.getText()));
 		
-		tableView.refresh();
+			database.getUtenteDAO().update(utente);
+			
+			tableView.refresh();
+		} else {
+			Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle("Modifica fallita");
+            alert.setHeaderText("Selezione non valida");
+            alert.setContentText("Non è possibile modificare il profilo di un ADMIN");
+            alert.showAndWait();
+		}
 	}
 	
 	/**

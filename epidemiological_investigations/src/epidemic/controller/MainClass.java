@@ -16,7 +16,7 @@ public class MainClass extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
-		primaryStage.setTitle("Log in");
+		primaryStage.setTitle("Epidemiological Investigations");
 		
 		initRootLayout();
 		showLoginScreen();
