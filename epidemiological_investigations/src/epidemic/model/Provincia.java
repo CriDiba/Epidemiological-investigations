@@ -57,4 +57,9 @@ public class Provincia extends Localita {
 		return (obj instanceof Provincia) && ((Provincia)obj).getId() == this.getId();
 	}
 	
+	@Override
+	public String toString() {
+		return getNome();
+	}
+	
 }

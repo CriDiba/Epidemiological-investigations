@@ -1,12 +1,18 @@
 package epidemic.controller;
 
 import java.io.IOException;
-import java.util.Date;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 
+import epidemic.model.CausaDecesso;
 import epidemic.model.Comune;
+import epidemic.model.Decesso;
 import epidemic.model.Provincia;
 import epidemic.model.Regione;
+import epidemic.model.SegnalazioneDecessi;
 import epidemic.model.Territorio;
 import epidemic.model.DAO.MySqlDAOFactory;
 import javafx.collections.FXCollections;
@@ -20,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableColumn;
@@ -28,6 +35,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -43,6 +51,8 @@ import javafx.stage.Stage;
  *
  */
 public class AutorizzatoInterfaceController {
+	
+	// Tab Dati Geografici
 	
     @FXML
     private TableView<Provincia> tableProvince;
@@ -70,62 +80,95 @@ public class AutorizzatoInterfaceController {
     @FXML
     private TableColumn<Comune, String> colComResponsabile;
     
-    
     @FXML
-    private TextField textRegNome;
+    private TextField textRegNome, textRegCapoluogo;
     @FXML
     private Spinner<Double> spinRegSuperficie;
-    @FXML
-    private TextField textRegCapoluogo;
     @FXML
     private ComboBox<Regione> comboRegione;
     
     @FXML
-	private ButtonBar btnProvincia;
+	private ButtonBar btnProvincia, btnComune;
     @FXML
-	private ButtonBar btnComune;
-    @FXML
-    private Button btnAddRegione;
-    @FXML
-    private Button btnEditRegione;
-    @FXML
-    private Button btnDeleteRegione;
+    private Button btnAddRegione, btnEditRegione, btnDeleteRegione;
     
 	private MySqlDAOFactory database;
 	private ObservableList<Regione> listaRegioni = FXCollections.observableArrayList();
 	private ObservableList<Provincia> listaProvince = FXCollections.observableArrayList();
 	private ObservableList<Comune> listaComuni = FXCollections.observableArrayList();
-	
 	private Regione regioneSelezionata;
 	private Provincia provinciaSelezionata;
 	private Comune comuneSelezionato;
-	
 	boolean insertRegioneMode = false;
+	
+	
+	// Tab Segnalazioni di Decesso
+	
+	@FXML
+	private ComboBox<Regione> comboRegioneSegnalazione;
+	@FXML
+	private ComboBox<Provincia> comboProvinciaSegnalazione;
+	@FXML
+	private VBox boxNuovaSegnalazione;
+	
+	@FXML
+	private TableView<SegnalazioneDecessi> tableSegnalazioni;
+	@FXML
+	private TableColumn<SegnalazioneDecessi, Integer> colIdSegnalazione;
+	@FXML
+	private TableColumn<SegnalazioneDecessi, Date> colDataSegnalazione;
+	@FXML
+	private TableColumn<SegnalazioneDecessi, Provincia> colProvinciaSegnalazione;
+	
+	@FXML
+	private Button btnNuovaSegnalazione, btnForzaSegnalazione;
+
+	@FXML
+	private Spinner<Integer> spinIncidenti, spinCardio, spinTumori, spinContagio;
+	
+	@FXML
+	private Label lblIncidenti, lblTumori, lblCardio, lblContagio;
+	
+	private Regione regioneSegnalazione;
+	private Provincia provinciaSegnalazione;
+	private ObservableList<Provincia> listaProvinceSegnalazione = FXCollections.observableArrayList();
+	private ObservableList<SegnalazioneDecessi> listaSegnalazioni = FXCollections.observableArrayList();
+	private boolean forzaSegnalazione = false;
     
-    
+	
 	/**
      * Inizializza il controller. Questo metodo viene invocato automaticamente 
      * dopo che il file fxml è stato caricato
+	 * @throws IOException 
 	 */
 	@FXML
-	public void initialize() {
+	public void initialize() throws IOException {
 
+		// Tab Dati Geografici
 		initTableProvinceCols();
 		initTableComuniCols();
 		spinRegSuperficie.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 0.1));
-		
 		database = new MySqlDAOFactory();
-		try {
-			listaRegioni.addAll(database.getRegioneDAO().getAll());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		listaRegioni.addAll(database.getRegioneDAO().getAll());
 		comboRegione.setItems(listaRegioni);
 		btnComune.setDisable(true);
 		btnProvincia.setDisable(true);
+		
+		
+		//Tab Segnalazioni
+		boxNuovaSegnalazione.setDisable(true);
+		comboRegioneSegnalazione.setItems(listaRegioni);
+		spinIncidenti.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+		spinCardio.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+		spinTumori.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+		spinContagio.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+		initTableSegnalazioniCols();
 	}
 
+	
+	//-------------------------------------------------------------
+	// TAB DATI GEOGRAFICI
+	//-------------------------------------------------------------
 	
 	/**
 	 * Se viene selezionata una regione attiva la tabella con le province corrispondenti
@@ -384,6 +427,162 @@ public class AutorizzatoInterfaceController {
 		colComResponsabile.setCellValueFactory(new PropertyValueFactory<>("responsabile"));
 	}
 	
+	
+	//-------------------------------------------------------------
+	// TAB SEGNALAZIONI
+	//-------------------------------------------------------------
+	
+	/**
+	 * Sblocca la creazione di una nuova segnalazione di decesso
+	 */
+	@FXML
+	private void handleNuovaSegnalazione() {
+		regioneSegnalazione = comboRegioneSegnalazione.getValue();
+		provinciaSegnalazione = comboProvinciaSegnalazione.getValue();
+		
+        if (regioneSegnalazione != null) {
+        	if(provinciaSegnalazione != null) {
+        		boxNuovaSegnalazione.setDisable(false);
+        		comboRegioneSegnalazione.setDisable(true);
+        		comboProvinciaSegnalazione.setDisable(true);
+        		btnNuovaSegnalazione.setDisable(true);
+        	} else {
+        		noSelectionWarning("Selezionare una Provincia per la quale effettuare una segnalazione");
+        	}
+        } else {
+        	noSelectionWarning("Selezionare una Regione per la quale effettuare una segnalazione");
+        }
+	}
+	
+	/**
+	 * Crea una nuova segnalazione di decesso se è trascorso un 
+	 * anno dalla data dell'ultima segnalazione
+	 * 
+	 * @throws IOException
+	 */
+	@FXML
+	private void handleAddSegnlazione() throws IOException {
+		Date dataOggi = new Date(System.currentTimeMillis());
+		if(!forzaSegnalazione && !dateIsValid(dataOggi, provinciaSegnalazione)) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setHeaderText("Segnalazione già effettuata per questa settimana!");
+			alert.showAndWait();
+			handleAnnullaSegnalazione();
+			return;
+		}
+		
+		List<Decesso> decessi = new ArrayList<Decesso>();
+		fillDecessi(decessi);
+		SegnalazioneDecessi nuovaSegnalazione = new SegnalazioneDecessi(decessi, dataOggi, provinciaSegnalazione);
+		int idSegnalazione = database.getSegnalazioneDecessiDAO().create(nuovaSegnalazione);
+		nuovaSegnalazione.setId(idSegnalazione);	
+		tableSegnalazioni.getItems().add(nuovaSegnalazione);
+		handleAnnullaSegnalazione();
+	}
+	
+	/**
+	 * Se viene selezionata una regione attiva la comboBox con le provincie
+	 * che fanno parte di quella regione
+	 * 
+	 * @throws IOException
+	 */
+	@FXML
+	private void handleSceltaRegSegnlazione() throws IOException {
+		regioneSegnalazione = comboRegioneSegnalazione.getValue();
+		listaSegnalazioni.clear();
+		listaProvinceSegnalazione.clear();
+		clearLbl();
+		if(regioneSegnalazione != null) {
+			for (Provincia provincia : database.getProvinciaDAO().getAll()) {
+				if(provincia.getRegioneAppartenenza().equals(regioneSegnalazione))
+					listaProvinceSegnalazione.add(provincia);
+			}
+			comboProvinciaSegnalazione.setItems(listaProvinceSegnalazione);
+		}
+	}
+	
+	/**
+	 * Se viene selezionata una provincia attiva la tabella
+	 * con le segnalazioni di decessi effettuate per quella
+	 * provincia
+	 * 
+	 * @throws IOException
+	 */
+	@FXML
+	private void handleSceltaProvSegnlazione() throws IOException {
+		provinciaSegnalazione = comboProvinciaSegnalazione.getValue();
+		listaSegnalazioni.clear();
+		clearLbl();
+		if(provinciaSegnalazione != null) {
+			listaSegnalazioni.addAll(database.getSegnalazioneDecessiDAO().getForProvincia(provinciaSegnalazione));
+		}
+		tableSegnalazioni.setItems(listaSegnalazioni);
+	}
+	
+	/**
+	 * Annulla la creazione di una nuova segnalazione di decesso
+	 */
+	@FXML
+	private void handleAnnullaSegnalazione() {
+		spinIncidenti.getValueFactory().setValue(0);
+		spinTumori.getValueFactory().setValue(0);
+		spinCardio.getValueFactory().setValue(0);
+		spinContagio.getValueFactory().setValue(0);
+		boxNuovaSegnalazione.setDisable(true);
+		btnNuovaSegnalazione.setDisable(false);
+		comboRegioneSegnalazione.setDisable(false);
+		comboProvinciaSegnalazione.setDisable(false);
+		if(forzaSegnalazione)
+			handleForzaSegnalazione();
+	}
+	
+	/**
+	 * Mostra i dati di una segnalazione di decesso divisi per causa di morte
+	 */
+	@FXML
+	private void handleSceltaSegnalazione() {
+		SegnalazioneDecessi segnalazione = tableSegnalazioni.getSelectionModel().getSelectedItem();
+		for (Decesso decesso : segnalazione.getDecessi()) {
+			switch (decesso.getCausa()) {
+			case INCIDENTE_STRADALE:
+				lblIncidenti.setText(decesso.getNumero() + "");
+				break;
+			case MALATTIA_TUMORALE:
+				lblTumori.setText(decesso.getNumero() + "");
+				break;
+			case MALATTIA_CARDIOVASCOLARE:
+				lblCardio.setText(decesso.getNumero() + "");
+				break;
+			case MALATTIA_CONTAGIOSA:
+				lblContagio.setText(decesso.getNumero() + "");
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Pulisce i campi Label
+	 */
+	private void clearLbl() {
+		lblIncidenti.setText("-");
+		lblTumori.setText("-");
+		lblCardio.setText("-");
+		lblContagio.setText("-");
+	}
+	
+	/**
+	 * Riempie la lista dei decessi di una segnalazione
+	 * con i valori degli Spinner
+	 * 
+	 * @param decessi
+	 */
+	private void fillDecessi(List<Decesso> decessi) {
+		decessi.add(new Decesso(CausaDecesso.INCIDENTE_STRADALE, spinIncidenti.getValue()));
+		decessi.add(new Decesso(CausaDecesso.MALATTIA_TUMORALE, spinTumori.getValue()));
+		decessi.add(new Decesso(CausaDecesso.MALATTIA_CARDIOVASCOLARE, spinCardio.getValue()));
+		decessi.add(new Decesso(CausaDecesso.MALATTIA_CONTAGIOSA, spinContagio.getValue()));
+	}
+	
 		
 	/**
 	 * Apre una finestra di dialogo per inserire i dati di una Provincia. 
@@ -425,6 +624,15 @@ public class AutorizzatoInterfaceController {
 	        e.printStackTrace();
 	        return false;
 	    }
+	}
+	
+	/**
+	 * Inizializza la tabella delle segnalazioni effettuate
+	 */
+	private void initTableSegnalazioniCols() {
+		colIdSegnalazione.setCellValueFactory(new PropertyValueFactory<>("id"));
+		colDataSegnalazione.setCellValueFactory(new PropertyValueFactory<>("data"));
+		colProvinciaSegnalazione.setCellValueFactory(new PropertyValueFactory<>("provinciaRiferimento"));
 	}
 	
 	
@@ -472,9 +680,10 @@ public class AutorizzatoInterfaceController {
 	
 	
 	/**
+	 * Genera un alert di conferma con un messaggio a video
 	 * 
-	 * @param messaggio
-	 * @return
+	 * @param messaggio da mostrare nell'alert
+	 * @return true se l'utente conferma, falso altrimenti
 	 */
 	private boolean confirmElimination(String messaggio) {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -491,8 +700,8 @@ public class AutorizzatoInterfaceController {
 	}
 	
 	/**
-	 * 
-	 * @param messaggio
+	 * Genera un alert di waring con un messaggio a video
+	 * @param messaggio da mostrare nell'alert
 	 */
 	private void noSelectionWarning(String messaggio) {
         Alert alert = new Alert(AlertType.WARNING);
@@ -529,6 +738,47 @@ public class AutorizzatoInterfaceController {
             
             return false;
         }
+	}
+	
+	/**
+	 * Controlla se è passato un Anno dall'ultima segnalazione
+	 * 
+	 * @param dataOggi data della nuova segnalazione
+	 * @param comuneRiferimento comune di cui dobbiamo controllare l'ultima segnalazione
+	 * @return true se la è possibile fare una nuova segnalazione oggi
+	 * @throws IOException
+	 */
+	private boolean dateIsValid(Date dataOggi, Provincia provincia) throws IOException {
+		SegnalazioneDecessi ultimaSegnalazione = database.getSegnalazioneDecessiDAO().getLastForProvincia(provincia);
+		Calendar cal1 = Calendar.getInstance();
+		Calendar cal2 = Calendar.getInstance();
+		
+		if(ultimaSegnalazione != null) {
+			cal1.setTime(dataOggi);
+			cal2.setTime(ultimaSegnalazione.getData());
+			if(cal1.get(Calendar.YEAR) <= cal2.get(Calendar.YEAR))
+				return false;
+		}
+		return true;
+	}
+	
+	
+	/**
+	 * Metodo che permette di forzare  l'inserimento di una segnalazione
+	 * dal momento che regolarmente è possibile un solo inserimento all'anno.
+	 */
+	@FXML
+	public void handleForzaSegnalazione() {
+		if(!forzaSegnalazione) {
+			forzaSegnalazione = true;
+			btnForzaSegnalazione.setStyle("-fx-background-color:#43C59E");
+			btnForzaSegnalazione.setText("Ripristina");
+		}
+		else {
+			forzaSegnalazione = false;
+			btnForzaSegnalazione.setStyle("-fx-background-color:#E94F37");
+			btnForzaSegnalazione.setText("Forza Segnalazione");
+		}
 	}
     
 }

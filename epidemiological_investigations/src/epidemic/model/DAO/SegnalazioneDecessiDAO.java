@@ -55,6 +55,89 @@ public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
 		return istance;
 	}
 	
+	/**
+	 * Ritorna l'ultima (più recente) segnalazione di decessi
+	 * presente nel database per una determinata provincia
+	 * 
+	 * @param provincia provincia da ricercare
+	 * @return ultima segnalazione effettuata per una provincia
+	 */
+	public SegnalazioneDecessi getLastForProvincia(Provincia provincia) {
+		SegnalazioneDecessi segnDecessi = null;
+		Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet result = null;
+        
+        try {
+        	connection = MySqlDAOFactory.createConnection();
+            preparedStatement = connection.prepareStatement(queries.getProperty("read_per_provincia_query"));
+            preparedStatement.setInt(1, provincia.getId());
+            preparedStatement.execute();
+            result = preparedStatement.getResultSet();
+            
+            while(result.next())
+            	if(result.isLast())
+            		segnDecessi = getItemFromRS(result);
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                result.close();
+            } catch (Exception rse) {
+                rse.printStackTrace();
+            }
+            try {
+                preparedStatement.close();
+            } catch (Exception sse) {
+                sse.printStackTrace();
+            }
+        }
+ 
+        return segnDecessi;
+	}
+	
+	
+	/**
+	 * Ritorna la lista delle segnalazioni effettuate per una provincia
+	 * 
+	 * @param provincia provincia da ricercare
+	 * @return lista di segnalazioni effettuate per quella provincia
+	 */
+	public List<SegnalazioneDecessi> getForProvincia(Provincia provincia) {
+		List<SegnalazioneDecessi> segnDecessi = new ArrayList<>();
+		Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet result = null;
+        
+        try {
+        	connection = MySqlDAOFactory.createConnection();
+            preparedStatement = connection.prepareStatement(queries.getProperty("read_per_provincia_query"));
+            preparedStatement.setInt(1, provincia.getId());
+            preparedStatement.execute();
+            result = preparedStatement.getResultSet();
+            
+            while(result.next())
+            	segnDecessi.add(getItemFromRS(result));
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                result.close();
+            } catch (Exception rse) {
+                rse.printStackTrace();
+            }
+            try {
+                preparedStatement.close();
+            } catch (Exception sse) {
+                sse.printStackTrace();
+            }
+        }
+ 
+        return segnDecessi;
+	}
+	
 	
 	@Override
 	public List<SegnalazioneDecessi> getAll() {
@@ -226,7 +309,7 @@ public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
 		Provincia provincia = null;
 		try {
 			listaDecessi = database.getDecessoDAO().getAllForSegnalazione(result.getInt("id"));			
-			provincia = database.getProvinciaDAO().get(result.getInt("id_comune"));
+			provincia = database.getProvinciaDAO().get(result.getInt("id_provincia"));
 		} catch(IOException e) {
 			e.printStackTrace();
 			return null;
