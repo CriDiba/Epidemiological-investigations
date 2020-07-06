@@ -164,6 +164,13 @@ public class ContrattoInterfaceController implements Initializable {
 	@FXML
 	public void handleSceltaComune() {
 		Comune comuneSelezionato = getComuneSelezionato();
+		if(comuneSelezionato == null) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setHeaderText("Comune non presente nel database!");
+			alert.showAndWait();
+			return;
+		}
+		
 		ArrayList<SegnalazioneContagi> segnalazioni = mappaComuneSegnalazioni.get(comuneSelezionato);
 		
 		comboIdSegnalazione.setItems(FXCollections.observableArrayList(getIdSegnalazioni(segnalazioni)));
@@ -183,7 +190,7 @@ public class ContrattoInterfaceController implements Initializable {
 		for(Comune comune: mappaComuneSegnalazioni.keySet())
 			if(comune.getNome().equals(comboComuneTueSegnalazioni.getValue()))
 				return comune;
-		return tuttiComuni;
+		return null;
 	}
 	
 	/**
@@ -251,6 +258,12 @@ public class ContrattoInterfaceController implements Initializable {
 	 */
 	@FXML
 	public void submitEdit() throws IOException {
+		Integer personeInCura = spinPressoMedico.getValue();
+		Integer personeRicoverate = spinTerapieIntensive.getValue();
+		
+		if(personeInCura == null || personeRicoverate == null)
+			return;
+		
 		for(SegnalazioneContagi segnalazione: mappaComuneSegnalazioni.get(getComuneSelezionato()))
 			if(segnalazione.getId() == comboIdSegnalazione.getValue()) {
 				for(Contagio contagio: segnalazione.getContagi())
@@ -261,9 +274,20 @@ public class ContrattoInterfaceController implements Initializable {
 						database.getContagioDAO().update(contagio);
 						lblPressoMedico.setText(String.valueOf(spinPressoMedico.getValue()));
 						lblTerapieIntensive.setText(String.valueOf(spinTerapieIntensive.getValue()));
+						comboMalattia.setValue(null);
 						return;
 					}
 			}
+	}
+	
+	/**
+	 * Metodo che prende l'id della
+	 * segnalazione selezionata e lo imposta
+	 * come id nella combobox di selezione segnalazioni
+	 */
+	@FXML
+	public void handleSceltaSegnalazione() {
+		comboIdSegnalazione.setValue(tableView.getSelectionModel().getSelectedItem().getId());
 	}
 	
 	/**
@@ -367,9 +391,9 @@ public class ContrattoInterfaceController implements Initializable {
 		
 		for(Comune comune: listaComuniResponsabilita) {
 			nomiComuniResponsabilita.add(comune.getNome());
+			mappaComuneSegnalazioni.put(comune, new ArrayList<>());
 			for(SegnalazioneContagi s: tutteSegnalazioni)
 				if(s.getComuneRiferimento().equals(comune)) {
-					mappaComuneSegnalazioni.putIfAbsent(comune, new ArrayList<>());
 					mappaComuneSegnalazioni.get(comune).add(s);
 					mappaComuneSegnalazioni.get(tuttiComuni).add(s);
 				}
@@ -408,7 +432,7 @@ public class ContrattoInterfaceController implements Initializable {
 	 * dell'utente
 	 */
 	private void handleLabelTextChange() {
-		if(!(lblSegnalazione.getText().equals("null") && lblMalattia.getText().equals("null"))) {
+		if(!lblSegnalazione.getText().equals("null") && !lblMalattia.getText().equals("null")) {
 			Contagio found = null;
 			for(SegnalazioneContagi segnalazione: mappaComuneSegnalazioni.get(getComuneSelezionato()))
 				if(segnalazione.getId() == comboIdSegnalazione.getValue()) {

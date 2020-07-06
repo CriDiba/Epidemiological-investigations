@@ -130,7 +130,7 @@
                               <Insets top="10.0" />
                            </VBox.margin>
                         </HBox>
-                        <Label fx:id="lblForza" prefHeight="18.0" prefWidth="214.0" text="Modalità forzatura inserimento attivata!" textAlignment="CENTER" visible="false">
+                        <Label fx:id="lblForza" prefHeight="18.0" prefWidth="214.0" text="Modalità inserimento forzato attivata!" textAlignment="CENTER" visible="false">
                            <font>
                               <Font name="System Italic" size="12.0" />
                            </font>
@@ -190,7 +190,7 @@
                            <children>
                               <SplitPane dividerPositions="0.7" orientation="VERTICAL" prefHeight="648.8" prefWidth="550.4" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <items>
-                                    <TableView fx:id="tableView" prefHeight="505.0" prefWidth="549.0">
+                                    <TableView fx:id="tableView" onMouseClicked="#handleSceltaSegnalazione" prefHeight="505.0" prefWidth="549.0">
                                       <columns>
                                         <TableColumn fx:id="colIdSegnalazione" prefWidth="75.0" text="Id Segnalazione" />
                                         <TableColumn fx:id="colDataSegnalazione" prefWidth="75.0" text="Data segnalazione" />
