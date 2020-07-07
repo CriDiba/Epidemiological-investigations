@@ -315,6 +315,8 @@ public class AutorizzatoInterfaceController {
 	    if (salvaClicked) {
 	        provinciaSelezionata.setId(database.getProvinciaDAO().create(provinciaSelezionata));
 	        tableProvince.getItems().add(provinciaSelezionata);
+	        if(regioneSelezionata.equals(regioneSegnalazione))
+	        	listaProvinceSegnalazione.add(provinciaSelezionata);
 	    }
 	}
 	
