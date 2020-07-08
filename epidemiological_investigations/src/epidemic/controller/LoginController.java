@@ -56,7 +56,7 @@ public class LoginController {
 		    		adminInterface();
 		    		break;
 		    	case ANALISTA:
-		    		//analistaInterface();
+		    		analistaInterface();
 		    		break;
 		    	case AUTORIZZATO: 
 		    		autorizzatoInterface();
@@ -71,7 +71,7 @@ public class LoginController {
     	password.clear();
 		
 	}
-	
+
 	/**
 	 * Funzione che calcola l'hash di
 	 * una stringa di testo, in particolare
@@ -129,6 +129,13 @@ public class LoginController {
 	private void autorizzatoInterface() throws IOException{
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainClass.class.getResource("/epidemic/view/AutorizzatoInterface.fxml"));
+		Scene scene = new Scene(loader.load());
+		mainReference.getPrimaryStage().setScene(scene);
+	}
+	
+	private void analistaInterface() throws IOException {
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(MainClass.class.getResource("/epidemic/view/AnalistaInterface.fxml"));
 		Scene scene = new Scene(loader.load());
 		mainReference.getPrimaryStage().setScene(scene);
 	}
