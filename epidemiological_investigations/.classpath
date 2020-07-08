@@ -19,6 +19,10 @@
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Java DBC"/>
+<<<<<<< HEAD
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/TableExport"/>
+=======
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ExportLib"/>
+>>>>>>> 99c7c937b81c3aa64919f07990de8e6314df7269
 	<classpathentry kind="output" path="bin"/>
 </classpath>
