@@ -156,8 +156,11 @@ public class AnalistaInterfaceController {
     	comboRegioneTabella.setItems(listaRegione);
     	
     	//bindings
-    	comboProvinciaTabella.disableProperty().bind(comboRegioneTabella.valueProperty().isNull());
-    	comboComuneTabella.disableProperty().bind(comboProvinciaTabella.valueProperty().isNull().or(comboProvinciaTabella.disabledProperty()));
+    	comboProvinciaTabella.disableProperty().bind(comboRegioneTabella.valueProperty().isNull()
+    			.or(comboRegioneTabella.valueProperty().isEqualTo(tutteRegioni)));
+    	comboComuneTabella.disableProperty().bind(comboProvinciaTabella.valueProperty().isNull()
+    			.or(comboProvinciaTabella.disabledProperty())
+    			.or(comboProvinciaTabella.valueProperty().isEqualTo(tutteProvince)));
     	
     	//inizializzazione combobox delle malattie contagiose
     	ObservableList<String> malattiaValues = FXCollections.observableArrayList();
@@ -196,11 +199,6 @@ public class AnalistaInterfaceController {
 		ObservableList<Provincia> province = FXCollections.observableArrayList();
 		province.add(tutteProvince);
 		
-		/*if(comboRegioneTabella.getValue().equals(tutteRegioni)) {
-			comboProvinciaTabella.setDisable(true);
-			return;
-		}*/
-		
 		for(Provincia p: listaProvincia) {
 			if(p.getRegioneAppartenenza().equals(comboRegioneTabella.getValue()))
 				province.add(p);
@@ -212,11 +210,6 @@ public class AnalistaInterfaceController {
 	public void loadComuni() {
 		ObservableList<Comune> comuni = FXCollections.observableArrayList();
 		comuni.add(tuttiComuni);
-		
-		/*if(comboProvinciaTabella.getValue().equals(tutteProvince)) {
-			comboComuneTabella.setDisable(true);
-			return;
-		}*/
 		
 		for(Comune c: listaComune) {
 			if(c.getProvinciaAppartenenza().equals(comboProvinciaTabella.getValue()))
@@ -481,8 +474,7 @@ public class AnalistaInterfaceController {
 		comboRegione.setItems(listaRegione);
 		comboProvincia.setItems(listaProvincia);
 		comboComune.setItems(listaComune);
-		
-		barChart();
+	
 		fillLista();	//serve per eliminare
 		
 	}
@@ -733,48 +725,6 @@ public class AnalistaInterfaceController {
 			
 	}
 	
-	private void barChart() {
-		
-//		barChart.getData().clear();
-//		
-//		XYChart.Series series = null;
-//		
-//		int totincura = 0;
-//		int totricoverate = 0;
-//		int totdecedute = 0;
-//		
-//		if (comboComune.getValue() != null) {
-//			for(Comune i: selectedComune) {	//inserisce dati nel grafico a linee (per ora tutti)
-//				totincura = 0;
-//				totricoverate = 0;
-//				totdecedute = 0;
-//	    		series = new XYChart.Series();
-//	    		//series.setName(i.getNome());
-//	    		for(SegnalazioneContagi segnaC: listasegnalazioneContagi) {		//i.getSegnalazioniContagi() da problemi (NullPointerException)
-//	    			if(segnaC.getComuneRiferimento().equals(i)) {				//soluzione alternativa...
-//	    				for(Contagio contagi: segnaC.getContagi()) {
-//    						totricoverate = totricoverate + contagi.getPersoneRicoverate();
-//							totincura = totincura + contagi.getPersoneInCura();
-//							
-////							else if (rbDecessi.isSelected()) {					perche decessi non per comune??
-////								System.out.println("rbDecessi");
-////								series.getData().add(new XYChart.Data(segna.getData().toString(), contagi.get));
-////							}
-//							
-//						}
-//					}		
-//				}
-//	    		
-//	    		if (rbInCura.isSelected())
-//	    			System.out.println("dato non disponibile per i comuni");
-//	    		
-//	    		series.getData().add(new XYChart.Data(i.getNome() + "ricoverate", totricoverate));
-//	    		series.getData().add(new XYChart.Data(i.getNome()+ "in cura", totincura));
-//	    		barChart.getData().addAll(series);
-//	    	}
-//	    	
-//		}
-	}
 	
 	//per convertire il n di persone in cura/contagi/morti in annuale
 	private int yearlyNumber() {	
@@ -851,84 +801,10 @@ public class AnalistaInterfaceController {
 		
 		fillLista();
 		lineChart();
-		barChart();
+		//barChart();
 		
 		
 		
-	}
-	    
-	    
-	
-	private void debug() {		//test di accesso vari, cancellare alla fine
-		
-//		System.out.println(comboRegione.getValue());
-//		System.out.println(comboProvincia.getValue());
-//		System.out.println(comboComune.getValue());
-//		System.out.println(comboLista.getValue());
-		
-//	
-//		for(Comune i: selectedComune) {
-//			System.out.println("comuni selezionati: "+i.getNome());
-//		}
-//		for(Provincia i: selectedProvincia) {
-//			System.out.println("provincie selezionati: "+i.getNome());
-//		}
-//		for(Regione i: selectedRegione) {
-//			System.out.println("regioni selezionate: "+i.getNome());
-//		}
-//		
-//		System.out.println();
-//		for(Contagio i: listaContagio) {
-//			System.out.print("malattia: " +i.getMalattia());
-//			System.out.println(" id: " +i.getId() + " persone in cura: " + i.getPersoneInCura() + " persone ricoverate " +i.getPersoneRicoverate());	
-//		}
-//	
-//		System.out.println();
-//		for(Comune i: listaComune) {
-//			System.out.println("id comune: " +i.getId() + " comune: " + i.getNome() + " superficie " +i.getSuperficie()+ " istat " +i.getIstat());	
-//		
-//			for(SegnalazioneContagi segna: listasegnalazioneContagi) {
-//				if(segna.getComuneRiferimento().equals(i)) {
-//					System.out.println("  id segnalazione: " +segna.getId()+ " Data: " + segna.getData() + " ComuneRiferimento " +segna.getComuneRiferimento());
-//			
-//					for(Contagio contagi: segna.getContagi()) {
-//						System.out.println("    persone in cura " + contagi.getMalattia());	    			
-//					}
-//				}
-//			}
-//		}
-//	
-//		System.out.println();
-//		for(SegnalazioneContagi segna: listasegnalazioneContagi) {
-//			System.out.println("  id segnalazione: " +segna.getId() + " Data: " + segna.getData() + " ComuneRiferimento " +segna.getComuneRiferimento());	
-//		
-//			for(Contagio contagi : segna.getContagi()) {
-//				System.out.println("    persone in cura " + contagi.getMalattia());
-//			
-//			}
-//		}
-//		
-//		System.out.println();
-//		for(Comune i: listaComune) {
-//			for(SegnalazioneContagi segnalazione: i.getSegnalazioniContagi()) {						//i.getSegnalazioniContagi() da problemi (NullPointerException)
-//				System.out.println(segnalazione.getId());
-//			}
-//			System.out.println("id Provincia: " +i.getId() + " Provincia: " + i.getNome());
-//		}
-//		
-//		System.out.println();
-//		for(Provincia i: listaProvincia) {
-//			System.out.println("id Provincia: " +i.getId() + " Provincia: " + i.getNome() + " RegioneAppartenenza " +i.getRegioneAppartenenza()+ " Capoluogo " +i.getCapoluogo());	
-//		}	
-//		
-//		System.out.println();
-//		for(Regione i: listaRegione ) {
-//			System.out.println("id Regione : " +i.getId() + " Regione : " + i.getNome());	
-//		}
-		
-		
-	
-		System.out.println();
 	}
 	
 	public class DisplayData {
