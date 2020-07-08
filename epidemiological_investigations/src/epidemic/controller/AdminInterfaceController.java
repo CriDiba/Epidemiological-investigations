@@ -215,7 +215,6 @@ public class AdminInterfaceController implements Initializable {
 			textNome.setText(utente.getNome());
 			textCognome.setText(utente.getCognome());
 			textUsername.setText(utente.getUsername());
-			textPassword.setText(utente.getPassword());
 			comboRuolo.setValue(utente.getRuolo());
         }
 	}
