@@ -224,7 +224,14 @@ public class ContrattoInterfaceController implements Initializable {
 		
 		List<Contagio> contagi = new ArrayList<>();
 		
-		fillContagi(contagi);
+		try {
+			fillContagi(contagi);
+		} catch (Exception e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setHeaderText("Uno o più campi non hanno un valore valido!");
+			alert.showAndWait();
+			return;
+		}
 		
 		
 		SegnalazioneContagi nuovaSegnalazione = new SegnalazioneContagi(contagi, dataOggi, comuneRiferimento);
@@ -249,7 +256,7 @@ public class ContrattoInterfaceController implements Initializable {
 		mappaComuneSegnalazioni.get(tuttiComuni).add(nuovaSegnalazione);
 		handleSceltaComune();
 	}
-	
+
 	/**
 	 * Metodo che invia al database
 	 * le modifiche effettuate su un
@@ -268,13 +275,15 @@ public class ContrattoInterfaceController implements Initializable {
 			if(segnalazione.getId() == comboIdSegnalazione.getValue()) {
 				for(Contagio contagio: segnalazione.getContagi())
 					if(contagio.getMalattia().equals(comboMalattia.getValue())) {
-						contagio.setPersoneInCura(spinPressoMedico.getValue());
-						contagio.setPersoneRicoverate(spinTerapieIntensive.getValue());
+						contagio.setPersoneInCura(personeInCura);
+						contagio.setPersoneRicoverate(personeRicoverate);
 						contagio.setSegnalazione(segnalazione);
 						database.getContagioDAO().update(contagio);
-						lblPressoMedico.setText(String.valueOf(spinPressoMedico.getValue()));
-						lblTerapieIntensive.setText(String.valueOf(spinTerapieIntensive.getValue()));
+						lblPressoMedico.setText(String.valueOf(personeInCura));
+						lblTerapieIntensive.setText(String.valueOf(personeRicoverate));
 						comboMalattia.setValue(null);
+						spinPressoMedico.getValueFactory().setValue(0);
+						spinTerapieIntensive.getValueFactory().setValue(0);
 						return;
 					}
 			}
@@ -287,7 +296,8 @@ public class ContrattoInterfaceController implements Initializable {
 	 */
 	@FXML
 	public void handleSceltaSegnalazione() {
-		comboIdSegnalazione.setValue(tableView.getSelectionModel().getSelectedItem().getId());
+		if(tableView.getSelectionModel().getSelectedItem() != null)
+			comboIdSegnalazione.setValue(tableView.getSelectionModel().getSelectedItem().getId());
 	}
 	
 	/**
@@ -411,7 +421,7 @@ public class ContrattoInterfaceController implements Initializable {
 		btnModifica.disableProperty().bind(comboMalattia.valueProperty().isNull().or(comboIdSegnalazione.valueProperty().isNull()));
 		lblSegnalazione.textProperty().bind(comboIdSegnalazione.valueProperty().asString());
 		lblMalattia.textProperty().bind(comboMalattia.valueProperty().asString());
-		lblSegnalazione.accessibleTextProperty().addListener(new ChangeListener<String>() {
+		lblSegnalazione.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
 				handleLabelTextChange();
