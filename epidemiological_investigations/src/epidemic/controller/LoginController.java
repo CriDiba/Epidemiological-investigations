@@ -71,17 +71,7 @@ public class LoginController {
     	password.clear();
 		
 	}
-<<<<<<< HEAD
-	
-	private void analistaInterface() throws IOException {
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(MainClass.class.getResource("/epidemic/view/test.fxml"));
-		Scene scene = new Scene(loader.load());
-		mainReference.getPrimaryStage().setScene(scene);
-		
-	}
-=======
->>>>>>> 99c7c937b81c3aa64919f07990de8e6314df7269
+
 
 	/**
 	 * Funzione che calcola l'hash di
