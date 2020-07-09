@@ -105,8 +105,8 @@ public class ContrattoInterfaceController implements Initializable {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		gridMalattie.setDisable(true);
-		setupBindingsAndListeners();
 		setupSpinners();
+		setupBindingsAndListeners();
 		comboMalattia.getItems().addAll(MalattiaContagiosa.values());
 		database = new MySqlDAOFactory();
 		try {
@@ -433,6 +433,23 @@ public class ContrattoInterfaceController implements Initializable {
 				handleLabelTextChange();
 			}
         });
+		
+		for(Spinner<Integer> sp: spinnerSet)
+			inputControlOnSpinner(sp);
+		inputControlOnSpinner(spinPressoMedico);
+		inputControlOnSpinner(spinTerapieIntensive);
+	}
+	
+	private void inputControlOnSpinner(Spinner<Integer> sp) {
+		sp.getEditor().textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
+		        String newValue) {
+		        if (!newValue.matches("\\d*")) {
+		        	sp.getEditor().setText(newValue.replaceAll("[^\\d]", ""));
+		        }
+		    }
+		});
 	}
 	
 	

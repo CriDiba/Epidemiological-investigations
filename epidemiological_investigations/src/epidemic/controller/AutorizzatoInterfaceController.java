@@ -15,6 +15,8 @@ import epidemic.model.Regione;
 import epidemic.model.SegnalazioneDecessi;
 import epidemic.model.Territorio;
 import epidemic.model.DAO.MySqlDAOFactory;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -143,7 +145,13 @@ public class AutorizzatoInterfaceController {
 	 */
 	@FXML
 	public void initialize() throws IOException {
-
+		
+		//Setup input control sugli spinner
+		inputControlOnSpinner(spinIncidenti);
+		inputControlOnSpinner(spinCardio);
+		inputControlOnSpinner(spinTumori);
+		inputControlOnSpinner(spinContagio);
+		
 		// Tab Dati Geografici
 		initTableProvinceCols();
 		initTableComuniCols();
@@ -473,6 +481,14 @@ public class AutorizzatoInterfaceController {
 			return;
 		}
 		
+		if(spinCardio.getValue() == null || spinContagio.getValue() == null || 
+				spinIncidenti.getValue() == null || spinTumori.getValue() == null) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setHeaderText("Correggere i campi non validi!");
+			alert.showAndWait();
+			return;
+		}
+		
 		List<Decesso> decessi = new ArrayList<Decesso>();
 		fillDecessi(decessi);
 		SegnalazioneDecessi nuovaSegnalazione = new SegnalazioneDecessi(decessi, dataOggi, provinciaSegnalazione);
@@ -781,6 +797,18 @@ public class AutorizzatoInterfaceController {
 			btnForzaSegnalazione.setStyle("-fx-background-color:#E94F37");
 			btnForzaSegnalazione.setText("Forza Segnalazione");
 		}
+	}
+	
+	private void inputControlOnSpinner(Spinner<Integer> sp) {
+		sp.getEditor().textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
+		        String newValue) {
+		        if (!newValue.matches("\\d*")) {
+		        	sp.getEditor().setText(newValue.replaceAll("[^\\d]", ""));
+		        }
+		    }
+		});
 	}
     
 }
