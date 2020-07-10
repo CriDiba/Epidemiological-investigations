@@ -40,26 +40,29 @@ import javafx.stage.FileChooser;
 public class AnalistaInterfaceController {
     
 	
-	@FXML private ComboBox<Regione> comboRegione;
-	@FXML private ComboBox<Provincia> comboProvincia;
-	@FXML private ComboBox<Comune> comboComune;
+	@FXML private ComboBox<Regione> comboRegioneGrafico;
+	@FXML private ComboBox<Provincia> comboProvinciaGrafico;
+	@FXML private ComboBox<Comune> comboComuneGrafico;
 	@FXML private ComboBox<String> comboLista;
 	
-	@FXML private ComboBox<MalattiaContagiosa> selezionaMalattia;
-	@FXML private ComboBox<CausaDecesso> causaMorte;
+	@FXML private ComboBox<String> comboContagiGrafico;
+	@FXML private ComboBox<String> comboDecessiGrafico;
+//	@FXML private ComboBox<MalattiaContagiosa> comboContagiGrafico;
+//	@FXML private ComboBox<CausaDecesso> comboDecessiGrafico;
     
+	@FXML private ComboBox<String> comboStatoContagioGrafico;
+	@FXML private TextField selectAnnoIniz;
+	@FXML private TextField selectAnnoFinal;
 	
     @FXML private CategoryAxis xLineChart;
     @FXML private NumberAxis yLineChart;
     @FXML private CategoryAxis xBarChart;
     @FXML private NumberAxis yBarChart;
 	
-    @FXML private ToggleGroup yAxys;
-    @FXML private RadioButton rbRicoverati;
-	@FXML private RadioButton rbInCura;
 	
-	@FXML private BarChart<?, ?> barChart;
+	@FXML private BarChart<String, Number> barChart;
 	@FXML private LineChart<String, Number> lineChart;
+//	@FXML private LineChart<String, Number> lineChart;
 	@FXML ToggleGroup chartGroup;
 	
 	@FXML private ComboBox<Regione> comboRegioneTabella;
@@ -148,9 +151,9 @@ public class AnalistaInterfaceController {
     	List<SegnalazioneDecessi> segnalazioneDecessi = database.getSegnalazioneDecessiDAO().getAll();
     	listasegnalazioneDecessi.addAll(segnalazioneDecessi);
     	
-    	comboRegione.setItems(listaRegione);
-    	comboProvincia.setItems(listaProvincia);
-    	comboComune.setItems(listaComune);
+    	comboRegioneGrafico.setItems(listaRegione);
+    	comboProvinciaGrafico.setItems(listaProvincia);
+    	comboComuneGrafico.setItems(listaComune);
     	
     	listaRegione.add(tutteRegioni);
     	comboRegioneTabella.setItems(listaRegione);
@@ -181,8 +184,14 @@ public class AnalistaInterfaceController {
     	comboStatoContagio.getItems().add(ricoverati);
     	comboStatoContagio.getItems().add(tuttiStatiContagio);
     	
-    	causaMorte.setItems(FXCollections.observableArrayList(CausaDecesso.values()));
-		selezionaMalattia.setItems(FXCollections.observableArrayList(MalattiaContagiosa.values()));	
+    	comboDecessiGrafico.setItems(decessoValues);
+    	comboContagiGrafico.setItems(malattiaValues);
+//    	comboDecessiGrafico.setItems(FXCollections.observableArrayList(CausaDecesso.values()));
+//    	comboContagiGrafico.setItems(FXCollections.observableArrayList(MalattiaContagiosa.values()));
+    	
+    	comboStatoContagioGrafico.getItems().add(pressoMedicoBase);
+    	comboStatoContagioGrafico.getItems().add(ricoverati);
+    	comboStatoContagioGrafico.getItems().add(tuttiStatiContagio);
 	}
 	
 	private void initTableCols() {
@@ -196,7 +205,7 @@ public class AnalistaInterfaceController {
 
 	@FXML
 	public void loadProvince() {		
-		ObservableList<Provincia> province = FXCollections.observableArrayList();
+		ObservableList<Provincia> province = FXCollections.observableArrayList();			//errore perche observable list, crea metodo nuovo
 		province.add(tutteProvince);
 		
 		for(Provincia p: listaProvincia) {
@@ -216,6 +225,29 @@ public class AnalistaInterfaceController {
 				comuni.add(c);
 		}
 		comboComuneTabella.setItems(comuni);
+	}
+
+	@FXML
+	public void loadProvinceGrafico() {	
+		ObservableList<Provincia> province = FXCollections.observableArrayList();
+		province.add(tutteProvince);
+		
+		for(Provincia p: listaProvincia) {
+			if(p.getRegioneAppartenenza().equals(comboRegioneGrafico.getValue()))
+				province.add(p);
+		}
+		comboProvinciaGrafico.setItems(province);
+	}
+	
+	@FXML
+	public void loadComuniGrafico() {
+		ObservableList<Comune> comuni = FXCollections.observableArrayList();
+		comuni.add(tuttiComuni);
+		for(Comune c: listaComune) {
+			if(c.getProvinciaAppartenenza().equals(comboProvinciaGrafico.getValue()))
+				comuni.add(c);
+		}
+		comboComuneGrafico.setItems(comuni);
 	}
 	
 	@FXML
@@ -245,13 +277,13 @@ public class AnalistaInterfaceController {
 				
 				for(SegnalazioneContagi sc: listasegnalazioneContagi) {
 					if(sc.getComuneRiferimento().getProvinciaAppartenenza().getRegioneAppartenenza().equals(r) && 
-							yearCheck(sc.getData(), annoSelezionato)) 
+							yearCheck(sc.getData(), annoSelezionato) == 0) 
 						totContagi += getContagi(sc, statoContagio, malattiaSelezionata);
 				}
 				
 				for(SegnalazioneDecessi sd: listasegnalazioneDecessi) {
 					if(sd.getProvinciaRiferimento().getRegioneAppartenenza().equals(r) &&
-							yearCheck(sd.getData(), annoSelezionato))
+							yearCheck(sd.getData(), annoSelezionato) == 0)
 						totDecessi += getDecessi(sd, causaDecessoSelezionata);
 				}
 				
@@ -268,13 +300,13 @@ public class AnalistaInterfaceController {
 						
 						for(SegnalazioneContagi sc: listasegnalazioneContagi) {
 							if(sc.getComuneRiferimento().getProvinciaAppartenenza().equals(p) && 
-									yearCheck(sc.getData(), annoSelezionato)) 
+									yearCheck(sc.getData(), annoSelezionato) == 0) 
 								totContagi += getContagi(sc, statoContagio, malattiaSelezionata);
 						}
 						
 						for(SegnalazioneDecessi sd: listasegnalazioneDecessi) {
 							if(sd.getProvinciaRiferimento().equals(p) &&
-									yearCheck(sd.getData(), annoSelezionato))
+									yearCheck(sd.getData(), annoSelezionato) == 0)
 								totDecessi += getDecessi(sd, causaDecessoSelezionata);
 						}
 						
@@ -291,7 +323,7 @@ public class AnalistaInterfaceController {
 							
 							for(SegnalazioneContagi sc: listasegnalazioneContagi) {
 								if(sc.getComuneRiferimento().equals(c) && 
-										yearCheck(sc.getData(), annoSelezionato)) 
+										yearCheck(sc.getData(), annoSelezionato) == 0) 
 									totContagi += getContagi(sc, statoContagio, malattiaSelezionata);
 							}
 							
@@ -304,7 +336,7 @@ public class AnalistaInterfaceController {
 					int totContagi = 0;
 					for(SegnalazioneContagi sc: listasegnalazioneContagi) {
 						if(sc.getComuneRiferimento().equals(comuneSelezionato) && 
-								yearCheck(sc.getData(), annoSelezionato)) 
+								yearCheck(sc.getData(), annoSelezionato) == 0) 
 							totContagi += getContagi(sc, statoContagio, malattiaSelezionata);
 					}
 
@@ -315,14 +347,25 @@ public class AnalistaInterfaceController {
 		tabellaDati.setItems(datiTab);
 	}
 	
-	private boolean yearCheck(Date dataSegnalazione, int annoSelezionato) throws IOException {
-		Calendar cal1 = Calendar.getInstance();
-		
-		cal1.setTime(dataSegnalazione);
-		if(cal1.get(Calendar.YEAR) != annoSelezionato)
-			return false;
-		return true;
-	}
+//	private boolean yearCheck(Date dataSegnalazione, int annoSelezionato) throws IOException {
+//		Calendar cal1 = Calendar.getInstance();
+//		
+//		cal1.setTime(dataSegnalazione);
+//		if(cal1.get(Calendar.YEAR) != annoSelezionato)
+//			return false;
+//		return true;
+//	}
+	
+	private int yearCheck(Date dataSegnalazione, int annoSelezionato) throws IOException {
+	Calendar cal1 = Calendar.getInstance();
+	
+	cal1.setTime(dataSegnalazione);
+	
+	return cal1.get(Calendar.YEAR) - annoSelezionato;
+	
+}
+	
+	
 	
 	private int getDecessi(SegnalazioneDecessi sd, String causaDecessoSelezionata) {
 		int totDecessi = 0;
@@ -340,14 +383,15 @@ public class AnalistaInterfaceController {
 	private int getContagi(SegnalazioneContagi sc, String statoContagio, String malattiaSelezionata) {
 		int totContagi = 0;
 		for(Contagio c: sc.getContagi()) {
+			
 			if(malattiaSelezionata != null && malattiaSelezionata != tuttiContagi 
 					&& !c.getMalattia().toString().equals(malattiaSelezionata))
 				continue;
-			if(statoContagio.equals(tuttiStatiContagio))
+			if(statoContagio.equals(tuttiStatiContagio)) 
 				totContagi += c.getPersoneInCura() + c.getPersoneRicoverate();
-			else if (statoContagio.equals(pressoMedicoBase))
+			else if (statoContagio.equals(pressoMedicoBase)) 
 				totContagi += c.getPersoneInCura();
-			else if (statoContagio.equals(ricoverati))
+			else if (statoContagio.equals(ricoverati)) 
 				totContagi += c.getPersoneRicoverate();
 		}
 		return totContagi;
@@ -392,344 +436,349 @@ public class AnalistaInterfaceController {
         file.save(saveFile.getAbsolutePath());
 	}
 	
-	public void fillProvincia(ActionEvent event) {		//se selezioni provincia e poi regione da errore (quindi if == null seleziona regione ?)
-		
-		ObservableList<Provincia> province = FXCollections.observableArrayList();
-		ObservableList<Comune>  comuni = FXCollections.observableArrayList();
-		
-		System.out.println(comboRegione.getValue());
-		for(Provincia i: listaProvincia) {
-			if(i.getRegioneAppartenenza().equals(comboRegione.getValue())) {
-				province.add(i);
-				for (Comune j : listaComune) {
-					if (j.getProvinciaAppartenenza().equals(i)) {
-						comuni.add(j);
-					}
-						
-				}
-			}
-		}
-		
-		comboProvincia.setItems(province);
-		comboComune.setItems(comuni);
-		
-	}
-	
-	public void fillComune(ActionEvent event) {
-		
-		ObservableList<Comune>  comuni = FXCollections.observableArrayList();
-		
-		System.out.println(comboProvincia.getValue().getNome()); 
-    	
-    	System.out.println();
-		for(Comune i: listaComune) {
-			if(i.getProvinciaAppartenenza().equals(comboProvincia.getValue())) {
-				comuni.add(i);
-			}
-		}
-		comboComune.setItems(comuni);
-	}
-	
 	
 	@FXML
-	void insertLuogo(ActionEvent event) {
-
-		if(comboRegione.getValue() == null && comboProvincia.getValue() == null &&  comboComune.getValue() == null) {
-			selectedRegione.addAll(listaRegione);
+	void fillGraph(ActionEvent event) throws IOException {
+		
+		
+		System.out.println(comboRegioneGrafico.getValue());
+		System.out.println(comboProvinciaGrafico.getValue());
+		System.out.println(comboComuneGrafico.getValue());
+		
+		if(comboRegioneGrafico.getValue().equals(tutteRegioni)) {							//se selezionato tutteRegioni
+			for(Regione r : listaRegione) {
+				if (!selectedRegione.contains(r)){
+					selectedRegione.add(r);
+				}
+			}
 			
 			System.out.println("printa tutte le regioni");
-			lineChart();
+			charts();
 		}
-			
-		else if(comboProvincia.getValue() == null &&  comboComune.getValue() == null) {
-			if (selectedRegione.contains(comboRegione.getValue())){
+		else if ((!comboRegioneGrafico.getValue().equals(tutteRegioni)) && comboProvinciaGrafico.getValue() == null) {	//se selezionato regione specifica, ma non la provincia
+			if (selectedRegione.contains(comboRegioneGrafico.getValue())){
 				System.out.println("hai gia questa regione");
 			}
 			else {
-				selectedRegione.add(comboRegione.getValue());				
-				lineChart();
+				selectedRegione.add(comboRegioneGrafico.getValue());
+				charts();
 			}
 		}
-		
-		else if(comboComune.getValue() == null) {
-			if (selectedProvincia.contains(comboProvincia.getValue())){
-				System.out.println("hai gia questa provincia");
+		else {																	//se selezionata una regione
+			if(comboProvinciaGrafico.getValue().equals(tutteProvince)) {						//se selezionato tutteProvince
+				for(Provincia p : listaProvincia) {
+					if (p.getRegioneAppartenenza().equals(comboRegioneGrafico.getValue()) && !selectedProvincia.contains(p)){
+						selectedProvincia.add(p);
+					}
+				}
+				System.out.println("printa tutte le provincie della regione");
+				charts();
+			}
+			
+				
+			
+			else if ((!comboProvinciaGrafico.getValue().equals(tutteProvince)) && comboComuneGrafico.getValue() == null) {	//se selezionato provincia specifica, ma non il comune
+				if (selectedProvincia.contains(comboProvinciaGrafico.getValue())){
+					System.out.println("hai gia questa provincia");
+				}
+				else {
+					selectedProvincia.add(comboProvinciaGrafico.getValue());
+					System.out.println("add " + comboProvinciaGrafico.getValue());
+					charts();
+				}
 			}
 			else {
-				selectedProvincia.add(comboProvincia.getValue());
-				lineChart();
+				if(comboComuneGrafico.getValue().equals(tuttiComuni)) { 			//tutte i comuni di una provincia
+					for(Comune c : listaComune) {
+						if (c.getProvinciaAppartenenza().equals(comboProvinciaGrafico.getValue())&& !selectedComune.contains(c)){
+							selectedComune.add(c);
+						}
+					}
+					System.out.println("printa tutte i comuni della provincia");
+					charts();
+					
+				}
+				else if (!comboComuneGrafico.getValue().equals(tuttiComuni)) {
+					if (selectedComune.contains(comboComuneGrafico.getValue())){
+						System.out.println("hai gia questo comune");
+					}
+					else {
+						selectedComune.add(comboComuneGrafico.getValue());
+						System.out.println("add " + comboComuneGrafico.getValue());
+						charts();
+					}
+				}
 			}
 		}
+				
 		
-		else {
-			if (selectedComune.contains(comboComune.getValue())){
-				System.out.println("hai gia questo comune");
-			}
-			else {
-				selectedComune.add(comboComune.getValue());
-				lineChart();
-			}
-		}
-		
-		comboRegione.setItems(listaRegione);
-		comboProvincia.setItems(listaProvincia);
-		comboComune.setItems(listaComune);
 	
 		fillLista();	//serve per eliminare
 		
 	}
 	
 	@FXML
-    public void updateGraph(ActionEvent event) {
-//		System.out.println("updateGraph\n");
+    public void updateGraph(ActionEvent event) throws IOException {
+		System.out.println("updateGraph\n");
 //		
-		System.out.println(selezionaMalattia.getValue());
+		System.out.println(comboContagiGrafico.getValue());
 	
-		System.out.println(causaMorte.getValue());
+		System.out.println(comboDecessiGrafico.getValue());
 		
 		
-		lineChart();
-		
-		comboRegione.setItems(listaRegione);
-		comboProvincia.setItems(listaProvincia);
-		comboComune.setItems(listaComune);
-//		
-//		for(Contagio contagi: listaContagio) {
-//			if(contagi.getMalattia() == selezionaMalattia.getValue()) {
-//				System.out.println(contagi.getMalattia() + " è uguale a " + selezionaMalattia.getValue());
-//			}
-//		}
+		charts();
 		 
 	}
 	
-	
-	private void lineChart() {	//per ora è data normale, non anno
-		
-		
-		
+	private String getYear(Date selectedDate) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(selectedDate);
+		return String.valueOf(calendar.get(Calendar.YEAR));
+	}
+
+	private void charts() throws IOException{	//per ora è data normale, non anno	
+		System.out.println("lineChart()");
 		lineChart.getData().clear();
-		//lineChart.setAnimated(false);									//si vuole l'animazione?
+		barChart.getData().clear();
 		
-		XYChart.Series<String, Number> serieContagio = null;
-		XYChart.Series<String, Number> serieDecesso = null;
+		Integer annoIniziale;
+		Integer annoFinale;
+		
+		try {
+			annoIniziale = Integer.parseInt(selectAnnoIniz.getText());
+		} catch (NumberFormatException e) {
+			selectAnnoIniz.clear();
+			return;
+		}
+		try {
+			annoFinale = Integer.parseInt(selectAnnoFinal.getText());
+		} catch (NumberFormatException e) {
+			selectAnnoFinal.clear();
+			return;
+		}
+		
+		XYChart.Series<String, Number> serieContagioline = null;
+		XYChart.Series<String, Number> serieDecessoline = null;
+		XYChart.Series<String, Number> serieContagiobar = null;
+		XYChart.Series<String, Number> serieDecessobar = null;
+		
+		
+		String malattiaSelezionata = comboContagiGrafico.getValue();
+		String causaDecessoSelezionata = comboDecessiGrafico.getValue();
+		String statoContagio = comboStatoContagioGrafico.getValue();
 		
 		TreeMap <String, Integer> casiContagio = new TreeMap<String,Integer>();
 		TreeMap <String, Integer> casiDecesso = new TreeMap<String,Integer>();
 		
+		System.out.println("anno selezionato " +annoIniziale.toString());
 		
-		if (!selectedComune.isEmpty()) {
-			
-			int totmalattie = 0;
-			
-			for(Comune i: selectedComune) {
-				serieContagio = new XYChart.Series<String, Number>();
-				serieContagio.setName(i.getNome());
-	    		
-	    		for(SegnalazioneContagi segna: listasegnalazioneContagi) {		//i.getSegnalazioniContagi() da problemi (NullPointerException)
-	    			if(segna.getComuneRiferimento().equals(i)) {				//soluzione alternativa...
-	    				totmalattie = 0;
-	    				for(Contagio contagi: segna.getContagi()) {
-	    					if(contagi.getMalattia() == selezionaMalattia.getValue()) {
-	    						if (rbRicoverati.isSelected()) {
-		    						yLineChart.setLabel("Persone Ricoverate");
-									totmalattie = totmalattie + contagi.getPersoneRicoverate();
-								}
-								else if (rbInCura.isSelected()) {
-									yLineChart.setLabel("Persone in Cura");
-									totmalattie = totmalattie + contagi.getPersoneInCura();
-								}
-	    					}
-			
-						}
-	    				serieContagio.getData().add(new XYChart.Data<String, Number>(segna.getData().toString(), totmalattie));
-					}		
-				}
-	    		lineChart.getData().add(serieContagio);
-	    	}
+		System.out.println("regioni selezionate");										//debug
+		for(Regione r: selectedRegione) {
+			System.out.print(r + " ,");
 		}
+		System.out.println();
 		
-		
-		if (!selectedProvincia.isEmpty()){
-			
-			int totmalattie = 0;
-			int totdecessi = 0;
-			
-			for(Provincia j: selectedProvincia) {	//inserisce dati nel grafico a linee (per ora tutti)
-				casiContagio.clear();
-				
-				serieContagio = new XYChart.Series<String, Number>();
-				
-				if(!selectedComune.isEmpty())
-					serieContagio.setName(j.getNome() + " (Prov.)");
-				else
-					serieContagio.setName(j.getNome());
-				
-				for(SegnalazioneContagi segnaC: listasegnalazioneContagi) {		//i.getSegnalazioniContagi() da problemi (NullPointerException)
-					totmalattie = 0;
-					
-					for(Comune i: listaComune) {
-						if(segnaC.getComuneRiferimento().equals(i)) {				//soluzione alternativa...
-							if (i.getProvinciaAppartenenza().equals(j)) {
-							
-								for(Contagio contagi: segnaC.getContagi()) {
-									if(contagi.getMalattia() == selezionaMalattia.getValue()) {
-										if (rbRicoverati.isSelected()) {
-											yLineChart.setLabel("Persone Ricoverate");
-											totmalattie = totmalattie + contagi.getPersoneRicoverate();
-										
-										}
-										else if (rbInCura.isSelected()) {
-											yLineChart.setLabel("Persone in Cura");
-											totmalattie = totmalattie + contagi.getPersoneInCura();
-										}
-									}
-								}
-							}
-						}	
-					}
-					if ((casiContagio.get(segnaC.getData().toString()) == null) ) {			//perche se aggiungo && (totmalattie != 0) viene null pointer??
-						casiContagio.put(segnaC.getData().toString(), totmalattie);
-					}
-					else {
-						int valore = casiContagio.get(segnaC.getData().toString()).intValue();
-						totmalattie = totmalattie + valore;
-						casiContagio.put(segnaC.getData().toString(), totmalattie);
-					}
-				}
-				
-				for (String i: casiContagio.keySet()) {
-					serieContagio.getData().add(new XYChart.Data<String, Number>(i, casiContagio.get(i)));
-				}
-
-				
-				
-				serieDecesso = new XYChart.Series<String, Number>();
-				serieDecesso.setName(j.getNome() + " Deceduti");
-				
-				for(SegnalazioneDecessi segnaD: listasegnalazioneDecessi) {
-	    			if(segnaD.getProvinciaRiferimento().equals(j)) {
-	    				totdecessi = 0;
-	    				for(Decesso decessi: segnaD.getDecessi()) {
-	    					if(decessi.getCausa() == causaMorte.getValue()) {
-	    						totdecessi = totdecessi + decessi.getNumero();
-	    					}
-	    					
-	    					
-	    				}
-	    				serieDecesso.getData().add(new XYChart.Data<String, Number>(segnaD.getData().toString(), totdecessi));
-	    				
-	    			}
-	    				
-	    			
-	    		}
-				lineChart.getData().addAll(serieContagio,serieDecesso);		//rischia di dare problemi con l'add seriecontagio di prima??
-			}
+		System.out.println("provincie selezionate");
+		for(Provincia r: selectedProvincia) {
+			System.out.print(r + " ,");
 		}
+		System.out.println();
+		
+		System.out.println("comuni selezionate");
+		for(Comune r: selectedComune) {
+			System.out.print(r + " ,");
+		}
+		System.out.println();
+		
 		
 		if (!selectedRegione.isEmpty()){
-			int totmalattie = 0;
-			int totdecessi = 0;
-			
-			for(Regione z: selectedRegione) {
-				casiContagio.clear();
-				serieContagio = new XYChart.Series<String, Number>();
-				serieContagio.setName(z.getNome());
-				for(Provincia j: listaProvincia) {	//inserisce dati nel grafico a linee (per ora tutti)
-					if (j.getRegioneAppartenenza().equals(z)) {
-						
-						
-						for(SegnalazioneContagi segnaC: listasegnalazioneContagi) {		//i.getSegnalazioniContagi() da problemi (NullPointerException)
-							totmalattie = 0;
-							for(Comune i: listaComune) {
-							
-								if(segnaC.getComuneRiferimento().equals(i)) {				//soluzione alternativa...
-									if (i.getProvinciaAppartenenza().equals(j)) {
-									
-										for(Contagio contagi: segnaC.getContagi()) {
-											if(contagi.getMalattia() == selezionaMalattia.getValue() || causaMorte.getValue() == null) {
-												if (rbRicoverati.isSelected()) {
-													yLineChart.setLabel("Persone Ricoverate");
-													totmalattie = totmalattie + contagi.getPersoneRicoverate();
-												
-												}
-												else if (rbInCura.isSelected()) {
-													yLineChart.setLabel("Persone in Cura");
-													totmalattie = totmalattie + contagi.getPersoneInCura();
-												}
-											}
-										}
-		
-									}
-								}	
-							}
-							if ((casiContagio.get(segnaC.getData().toString()) == null) ) {			//perche se aggiungo && (totmalattie != 0) viene null pointer??
-								casiContagio.put(segnaC.getData().toString(), totmalattie);
-							}
-							else {
-								int valore = casiContagio.get(segnaC.getData().toString()).intValue();
-								totmalattie = totmalattie + valore;
-								casiContagio.put(segnaC.getData().toString(), totmalattie);
-							}
-						}
-		    		}
+			System.out.println();
+			for(Regione r: selectedRegione) {
+				System.out.println("dentro for regione" + r);
+				
+				int totContagi = 0;
+				int totDecessi = 0;
+				
+				serieContagioline = new XYChart.Series<String, Number>();
+				serieContagioline.setName(r.getNome());
+				serieContagiobar = new XYChart.Series<String, Number>();
+				serieContagiobar.setName(r.getNome());
+				
+				for(SegnalazioneContagi sc: listasegnalazioneContagi) {
+					if(sc.getComuneRiferimento().getProvinciaAppartenenza().getRegioneAppartenenza().equals(r) && 
+							yearCheck(sc.getData(), annoIniziale) >= 0 && yearCheck(sc.getData(), annoFinale) <= 0) {
 					
-				}
-				for (String i: casiContagio.keySet()) {
-					serieContagio.getData().add(new XYChart.Data<String, Number>(i, casiContagio.get(i)));
-				}
-				
-				serieDecesso = new XYChart.Series<String, Number>();
-				serieDecesso.setName(z.getNome() + " Deceduti");
-				
-				for(Provincia j: listaProvincia) {	//inserisce dati nel grafico a linee (per ora tutti)
-					if (j.getRegioneAppartenenza().equals(z)) {
+						totContagi += getContagi(sc, statoContagio, malattiaSelezionata);
 						
-						
-						for(SegnalazioneDecessi segnaD: listasegnalazioneDecessi) {
-			    			if(segnaD.getProvinciaRiferimento().equals(j)) {
-			    				totdecessi = 0;
-			    				for(Decesso decessi: segnaD.getDecessi()) {
-			    					if(decessi.getCausa() == causaMorte.getValue() || causaMorte.getValue() == null) {
-			    						totdecessi = totdecessi + decessi.getNumero();
-			    					}
-			    				}
-			    				
-			    				if ((casiDecesso.get(segnaD.getData().toString()) == null) ) {			//perche se aggiungo && (totmalattie != 0) viene null pointer??
-									casiDecesso.put(segnaD.getData().toString(), totdecessi);
-								}
-								else {
-									int valore = casiDecesso.get(segnaD.getData().toString()).intValue();
-									totdecessi = totdecessi + valore;
-									casiDecesso.put(segnaD.getData().toString(), totdecessi);
-								}
-			    			}
-						
+						if ((casiContagio.get(getYear(sc.getData())) == null) && getContagi(sc, statoContagio, malattiaSelezionata) != 0) {			//perche se aggiungo && (totmalattie != 0) viene null pointer??
+							casiContagio.put(getYear(sc.getData()), getContagi(sc, statoContagio, malattiaSelezionata));
+						}
+						else {
+							int valore = casiContagio.get(getYear(sc.getData())).intValue();
+							valore = getContagi(sc, statoContagio, malattiaSelezionata) + valore;
+							casiContagio.put(getYear(sc.getData()), valore);
 						}
 					}
 				}
+				serieContagiobar.getData().add(new XYChart.Data<String, Number>(r.getNome(), totContagi));
+				for (String i: casiContagio.keySet()) {
+					serieContagioline.getData().add(new XYChart.Data<String, Number>(i, casiContagio.get(i)));
+					System.out.println("persone contagiate in data " + i + " sono " + casiContagio.get(i));
+				}
+				casiContagio.clear();
+				
+				serieDecessoline = new XYChart.Series<String, Number>();
+				serieDecessoline.setName(r.getNome() + " Deceduti");
+				serieDecessobar = new XYChart.Series<String, Number>();
+				serieDecessobar.setName(r.getNome() + " Deceduti");
+				
+				for(SegnalazioneDecessi sd: listasegnalazioneDecessi) {
+					if(sd.getProvinciaRiferimento().getRegioneAppartenenza().equals(r) &&
+							yearCheck(sd.getData(), annoIniziale) >= 0 && yearCheck(sd.getData(), annoFinale) <= 0) {
+						
+						totDecessi += getDecessi(sd, causaDecessoSelezionata);
+						
+						if ((casiDecesso.get(getYear(sd.getData())) == null) ) {			//perche se aggiungo && (totmalattie != 0) viene null pointer??
+							casiDecesso.put(getYear(sd.getData()), getDecessi(sd, causaDecessoSelezionata));
+						}
+						else {
+							int valore = casiDecesso.get(getYear(sd.getData())).intValue();
+							valore = getDecessi(sd, causaDecessoSelezionata) + valore;
+							casiDecesso.put(getYear(sd.getData()), valore);
+						}
+					}
+				}
+				serieDecessobar.getData().add(new XYChart.Data<String, Number>(r.getNome(), totDecessi));
 				for (String i: casiDecesso.keySet()) {
+					serieDecessoline.getData().add(new XYChart.Data<String, Number>(i, casiDecesso.get(i)));
+					System.out.println("persone decedute in data " + i + " sono " + casiDecesso.get(i));
+				}
+				casiDecesso.clear();
+				
+				
+				lineChart.getData().addAll(serieContagioline,serieDecessoline);		
+				barChart.getData().addAll(serieContagiobar,serieDecessobar);
+			}
+			
+		}
+		
+		if (!selectedProvincia.isEmpty()){
+			System.out.println();
+			for(Provincia p: selectedProvincia) {
+				System.out.println("dentro for provincia" + p);
+				int totContagi = 0;
+				int totDecessi = 0;
+				
+				serieContagioline = new XYChart.Series<String, Number>();
+				serieContagioline.setName(p.getNome()+ " prov");
+				serieContagiobar = new XYChart.Series<String, Number>();
+				serieContagiobar.setName(p.getNome() + " prov");
+				
+				for(SegnalazioneContagi sc: listasegnalazioneContagi) {
+					if(sc.getComuneRiferimento().getProvinciaAppartenenza().equals(p) && 
+							yearCheck(sc.getData(), annoIniziale) >= 0 && yearCheck(sc.getData(), annoFinale) <= 0) {
 					
-					serieDecesso.getData().add(new XYChart.Data<String, Number>(i, casiDecesso.get(i)));
-					System.out.println("persone morte sono " + casiDecesso.get(i));
+						totContagi += getContagi(sc, statoContagio, malattiaSelezionata);
+						
+						if ((casiContagio.get(getYear(sc.getData())) == null) && getContagi(sc, statoContagio, malattiaSelezionata) != 0) {
+							casiContagio.put(getYear(sc.getData()), getContagi(sc, statoContagio, malattiaSelezionata));
+						}
+						else {
+							int valore = casiContagio.get(getYear(sc.getData())).intValue();
+							valore = getContagi(sc, statoContagio, malattiaSelezionata) + valore;
+							casiContagio.put(getYear(sc.getData()), valore);
+						}
+					}
+				}
+				serieContagiobar.getData().add(new XYChart.Data<String, Number>(p.getNome()+" prov", totContagi));
+				for (String i: casiContagio.keySet()) {
+					serieContagioline.getData().add(new XYChart.Data<String, Number>(i, casiContagio.get(i)));
+					System.out.println("persone contagiate in data " + i + " sono " + casiContagio.get(i));
+				}
+				casiContagio.clear();
+				
+				serieDecessoline = new XYChart.Series<String, Number>();
+				serieDecessoline.setName(p.getNome() + " prov Deceduti");
+				serieDecessobar = new XYChart.Series<String, Number>();
+				serieDecessobar.setName(p.getNome() + " prov Deceduti");
+				
+				for(SegnalazioneDecessi sd: listasegnalazioneDecessi) {
+					if(sd.getProvinciaRiferimento().equals(p) &&
+							yearCheck(sd.getData(), annoIniziale) >= 0 && yearCheck(sd.getData(), annoFinale) <= 0) {
+						
+						totDecessi += getDecessi(sd, causaDecessoSelezionata);
+						
+						if ((casiDecesso.get(getYear(sd.getData())) == null) ) {
+							casiDecesso.put(getYear(sd.getData()), getDecessi(sd, causaDecessoSelezionata));
+						}
+						else {
+							int valore = casiDecesso.get(getYear(sd.getData())).intValue();
+							valore = getDecessi(sd, causaDecessoSelezionata) + valore;
+							casiDecesso.put(getYear(sd.getData()), valore);
+						}
+					}
+				}
+				serieDecessobar.getData().add(new XYChart.Data<String, Number>(p.getNome()+" prov", totDecessi));
+				for (String i: casiDecesso.keySet()) {
+					serieDecessoline.getData().add(new XYChart.Data<String, Number>(i, casiDecesso.get(i)));
+					System.out.println("persone decedute in data " + i + " sono " + casiDecesso.get(i));
+				}
+				casiDecesso.clear();
+				lineChart.getData().addAll(serieContagioline,serieDecessoline);		
+				barChart.getData().addAll(serieContagiobar,serieDecessobar);
+			}
+			
+		}
+		
+		if (!selectedComune.isEmpty()) {
+			System.out.println();
+			for(Comune c: selectedComune) {
+				System.out.println("dentro for comune" + c);
+				
+				int totContagi = 0;
+				
+				serieContagioline = new XYChart.Series<String, Number>();
+				serieContagioline.setName(c.getNome());
+				serieContagiobar = new XYChart.Series<String, Number>();
+				serieContagiobar.setName(c.getNome());
+				
+				for(SegnalazioneContagi sc: listasegnalazioneContagi) {
+					if(sc.getComuneRiferimento().equals(c) && 
+							yearCheck(sc.getData(), annoIniziale) >= 0 && yearCheck(sc.getData(), annoFinale) <= 0) {
+					
+						totContagi += getContagi(sc, statoContagio, malattiaSelezionata);
+						
+						if ((casiContagio.get(getYear(sc.getData())) == null) && getContagi(sc, statoContagio, malattiaSelezionata) != 0) {
+							casiContagio.put(getYear(sc.getData()), getContagi(sc, statoContagio, malattiaSelezionata));
+						}
+						else {
+							int valore = casiContagio.get(getYear(sc.getData())).intValue();
+							valore = getContagi(sc, statoContagio, malattiaSelezionata) + valore;
+							casiContagio.put(getYear(sc.getData()), valore);
+						}
+					}
+					
 				}
 				
+				serieContagiobar.getData().add(new XYChart.Data<String, Number>(c.toString(), totContagi));
+				for (String i: casiContagio.keySet()) {
+					serieContagioline.getData().add(new XYChart.Data<String, Number>(i, casiContagio.get(i)));
+					System.out.println("persone contagiate in data " + i + " sono " + casiContagio.get(i));
+				}
+				casiContagio.clear();
 				
-				lineChart.getData().addAll(serieContagio,serieDecesso);
-//				lineChart.getData().add(serieContagio);
+				lineChart.getData().add(serieContagioline);	
+				barChart.getData().add(serieContagiobar);
 				
 				
 			}
+			
 		}
 		
-//		lineChart.getData().remove(arg0)			maybe in futuro
-			
 	}
+		
+
 	
-	
-	//per convertire il n di persone in cura/contagi/morti in annuale
-	private int yearlyNumber() {	
-		return 0;			
-	}
 	
 	
 	@FXML
@@ -754,7 +803,7 @@ public class AnalistaInterfaceController {
 		}
 		if(!selectedProvincia.isEmpty()) {
 			for(Provincia i : selectedProvincia)
-				lista.add(i.getNome());
+				lista.add(i.getNome() + "prov");
 			comboLista.setItems(lista);
 		}
 		if(!selectedRegione.isEmpty()) {
@@ -766,7 +815,7 @@ public class AnalistaInterfaceController {
 	}
 	
 	@FXML
-	void deleteCampo(ActionEvent event) {
+	void deleteCampo(ActionEvent event) throws IOException {
 
 		Comune deleteC = null;
 		Provincia deleteP = null;
@@ -783,7 +832,9 @@ public class AnalistaInterfaceController {
 		
 		if(!selectedProvincia.isEmpty()) {
 			for(Provincia i : selectedProvincia) {
-				if (i.getNome().equals(comboLista.getValue())) {
+				String provincia = i.getNome() + "prov";
+				if (provincia.equals(comboLista.getValue())) {
+					System.out.println(provincia + " equals " + comboLista.getValue());
 					deleteP = i;
 				}
 			}
@@ -800,10 +851,7 @@ public class AnalistaInterfaceController {
 		}
 		
 		fillLista();
-		lineChart();
-		//barChart();
-		
-		
+		charts();
 		
 	}
 	
