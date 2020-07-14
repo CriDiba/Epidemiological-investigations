@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
 
 public class LoginController {
 	private MainClass mainReference;
@@ -27,6 +28,9 @@ public class LoginController {
 	
 	@FXML
 	private ProgressIndicator progressIndicator;
+	
+	@FXML 
+	private Text txtCredenziali;
 	
 	private static int idUtente;
 	
@@ -66,6 +70,9 @@ public class LoginController {
 		    		break;
 			}
     	}
+    	
+    	txtCredenziali.setVisible(true);
+    	
     
     	progressIndicator.setVisible(false);
     	password.clear();

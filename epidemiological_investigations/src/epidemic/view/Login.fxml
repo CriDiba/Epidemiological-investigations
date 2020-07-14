@@ -34,6 +34,7 @@
                </image>
             </ImageView>
             <ProgressIndicator fx:id="progressIndicator" layoutX="237.0" layoutY="295.0" prefHeight="42.0" prefWidth="26.0" visible="false" AnchorPane.bottomAnchor="0.20000000000002416" AnchorPane.leftAnchor="237.0" AnchorPane.rightAnchor="236.6" AnchorPane.topAnchor="273.4" />
+            <Text fx:id="txtCredenziali" layoutX="114.0" layoutY="286.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Le credenziali potrebbero non essere corrette, riprovare!" visible="false" />
          </children>
       </AnchorPane>
    </children>

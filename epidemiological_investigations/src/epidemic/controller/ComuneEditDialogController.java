@@ -163,7 +163,7 @@ public class ComuneEditDialogController {
 	private boolean isInputValid() {
 		String errorMessage = "";
 		
-		 if (textNome.getText() == null || textNome.getText().length() == 0)
+		 if (textNome.getText() == null || textNome.getText().length() == 0 || textNome.getText().matches(".*\\d+.*"))
 	            errorMessage += "Nome non valido\n"; 
 
 		 if (textIstat.getText() == null || textIstat.getText().length() != 6 || !textIstat.getText().chars().allMatch(c -> Character.isDigit(c)))
