@@ -407,7 +407,7 @@ public class AutorizzatoInterfaceController {
         if (comune != null) {
         	if(!confirmElimination("Verrà eliminato il comune selezionato"))
     			return;
-        	
+        	System.out.println(comune.getId());
     		database.getComuneDAO().delete(comune);
     		tableComuni.getItems().remove(comune);
         } else {

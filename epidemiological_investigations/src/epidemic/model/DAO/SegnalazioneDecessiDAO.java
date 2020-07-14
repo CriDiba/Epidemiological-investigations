@@ -315,7 +315,10 @@ public class SegnalazioneDecessiDAO implements DAO<SegnalazioneDecessi> {
 			return null;
 		}
 		
-		return new SegnalazioneDecessi(listaDecessi, result.getDate("data"), provincia);
+		SegnalazioneDecessi segnalazione = new SegnalazioneDecessi(listaDecessi, result.getDate("data"), provincia);
+		segnalazione.setId(result.getInt("id"));
+		
+		return segnalazione;
 	}
 	
 	/**
