@@ -308,6 +308,10 @@ public class AnalistaInterfaceController {
 		
 		if(regSelezionata.equals(tutteRegioni)) {
 			for(Regione r: listaRegione) {
+				
+				if(r.equals(tutteRegioni))
+					continue;
+				
 				int totContagi = 0;
 				int totDecessi = 0;
 				
@@ -330,6 +334,9 @@ public class AnalistaInterfaceController {
 		else {
 			if(provSelezionata.equals(tutteProvince)) {
 				for(Provincia p: listaProvincia) {
+					if(p.equals(tutteProvince))
+						continue;
+					
 					if(p.getRegioneAppartenenza().equals(regSelezionata)) {
 						int totContagi = 0;
 						int totDecessi = 0;
@@ -354,6 +361,9 @@ public class AnalistaInterfaceController {
 			else {
 				if(comuneSelezionato.equals(tuttiComuni)) {
 					for(Comune c: listaComune) {
+						if(c.equals(tuttiComuni))
+							continue;
+						
 						if(c.getProvinciaAppartenenza().equals(provSelezionata)) {
 							int totContagi = 0;
 							
@@ -382,15 +392,6 @@ public class AnalistaInterfaceController {
 		}
 		tabellaDati.setItems(datiTab);
 	}
-	
-//	private boolean yearCheck(Date dataSegnalazione, int annoSelezionato) throws IOException {
-//		Calendar cal1 = Calendar.getInstance();
-//		
-//		cal1.setTime(dataSegnalazione);
-//		if(cal1.get(Calendar.YEAR) != annoSelezionato)
-//			return false;
-//		return true;
-//	}
 	
 	private int yearCheck(Date dataSegnalazione, int annoSelezionato) throws IOException {
 	Calendar cal1 = Calendar.getInstance();
@@ -443,7 +444,7 @@ public class AnalistaInterfaceController {
         for(int column = 0; column < tabellaDati.getColumns().size(); column++)
             worksheet.getCell(0, column).setValue(tabellaDati.getColumns().get(column).getText());
         
-        for (int row = 1; row < tabellaDati.getItems().size(); row++) {
+        for (int row = 1; row <= tabellaDati.getItems().size(); row++) {
             List<String> cells = new ArrayList<String>();
             
             DisplayData dati = tabellaDati.getItems().get(row - 1);
@@ -567,7 +568,7 @@ public class AnalistaInterfaceController {
 	private Long endYear(Date selectedDate) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(selectedDate);
-		calendar.set(Calendar.MONTH, 12);
+		calendar.set(Calendar.MONTH, 11);
 		calendar.set(Calendar.DAY_OF_MONTH, 31);
 		return calendar.getTimeInMillis();
 	}
@@ -576,11 +577,11 @@ public class AnalistaInterfaceController {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, year);
 		if(upperBound) {
-			calendar.set(Calendar.MONTH, 12);
+			calendar.set(Calendar.MONTH, 11);
 			calendar.set(Calendar.DAY_OF_MONTH, 31);
 		}
 		else {
-			calendar.set(Calendar.MONTH, 1);
+			calendar.set(Calendar.MONTH, 0);
 			calendar.set(Calendar.DAY_OF_MONTH, 1);
 		}
 		return calendar.getTimeInMillis();
@@ -818,10 +819,13 @@ public class AnalistaInterfaceController {
 			newValue += getDecessi(sd, causaDecessoSelezionata);
 			casiDecesso.put(endYear(sd.getData()), newValue);
 		}
-		if(casiDecesso.firstKey() < lowerBound)
-			lowerBound = casiDecesso.firstKey();
-		if(casiDecesso.lastKey() > upperBound)
-			upperBound = casiDecesso.lastKey();
+		
+		if(casiDecesso.firstKey() != null) {
+			if(casiDecesso.firstKey() < lowerBound)
+				lowerBound = casiDecesso.firstKey();
+			if(casiDecesso.lastKey() > upperBound)
+				upperBound = casiDecesso.lastKey();
+		}
 		
 		return casiDecesso;
 	}
@@ -841,12 +845,14 @@ public class AnalistaInterfaceController {
 	 */
 	private TreeMap<Long,Integer> fillCasiContagio(TreeMap<Long,Integer> casiContagio, SegnalazioneContagi sc, String statoContagio, String malattiaSelezionata) {
 		long dateAsLong = dateToLong(sc.getData());
+		int contagi = getContagi(sc, statoContagio, malattiaSelezionata);
+		
 		if(!raggruppaAnno.isSelected()) {
 			if(casiContagio.containsKey(dateAsLong))
 				casiContagio.put(dateAsLong, 
-						casiContagio.get(dateAsLong) + getContagi(sc, statoContagio, malattiaSelezionata));
+						casiContagio.get(dateAsLong) + contagi);
 			else
-				casiContagio.put(dateAsLong, getContagi(sc, statoContagio, malattiaSelezionata));
+				casiContagio.put(dateAsLong, contagi);
 			
 			if(casiContagio.firstKey() < lowerBound)
 				lowerBound = casiContagio.firstKey();
@@ -855,12 +861,13 @@ public class AnalistaInterfaceController {
 			return casiContagio;
 		}
 		
-		if (getContagi(sc, statoContagio, malattiaSelezionata) != 0)
-			casiContagio.putIfAbsent(endYear(sc.getData()), getContagi(sc, statoContagio, malattiaSelezionata));
+		if (contagi != 0) {
+			casiContagio.putIfAbsent(endYear(sc.getData()), contagi);
 		
-		if (casiContagio.containsKey(endYear(sc.getData()))) {
-			int newValue = casiContagio.get(endYear(sc.getData())).intValue() + getContagi(sc, statoContagio, malattiaSelezionata);
-			casiContagio.put(endYear(sc.getData()), newValue);
+			if (casiContagio.containsKey(endYear(sc.getData()))) {
+				int newValue = casiContagio.get(endYear(sc.getData())) + contagi;
+				casiContagio.put(endYear(sc.getData()), newValue);
+			}
 		}
 		
 		if(casiContagio.firstKey() < lowerBound)
@@ -894,18 +901,17 @@ public class AnalistaInterfaceController {
 		if(!selectedComune.isEmpty()) {
 			for(Comune i : selectedComune)
 				lista.add(i.getNome());
-			comboLista.setItems(lista);
 		}
 		if(!selectedProvincia.isEmpty()) {
 			for(Provincia i : selectedProvincia)
-				lista.add(i.getNome() + "prov");
-			comboLista.setItems(lista);
+				lista.add(i.getNome() + " (Provincia)");
 		}
 		if(!selectedRegione.isEmpty()) {
 			for(Regione i : selectedRegione)
-				lista.add(i.getNome());
-			comboLista.setItems(lista);			
+				lista.add(i.getNome());			
 		}
+		
+		comboLista.setItems(lista);
 	}
 	
 	/**
