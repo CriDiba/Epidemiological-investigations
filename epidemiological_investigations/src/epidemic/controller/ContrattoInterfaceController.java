@@ -271,6 +271,13 @@ public class ContrattoInterfaceController implements Initializable {
 		if(personeInCura == null || personeRicoverate == null)
 			return;
 		
+		if(getComuneSelezionato() == null) {
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setHeaderText("Impostare un comune valido!");
+			alert.showAndWait();
+			return;
+		}
+		
 		for(SegnalazioneContagi segnalazione: mappaComuneSegnalazioni.get(getComuneSelezionato()))
 			if(segnalazione.getId() == comboIdSegnalazione.getValue()) {
 				for(Contagio contagio: segnalazione.getContagi())

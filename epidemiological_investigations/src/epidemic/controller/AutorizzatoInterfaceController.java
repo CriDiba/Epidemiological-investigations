@@ -737,9 +737,9 @@ public class AutorizzatoInterfaceController {
 	private boolean isInputValid() {
 		String errorMessage = "";
 		
-		 if (textRegNome.getText() == null || textRegNome.getText().length() == 0)
+		 if (textRegNome.getText() == null || textRegNome.getText().length() == 0 || textRegNome.getText().matches(".*\\d+.*"))
 	            errorMessage += "Nome non valido\n"; 
-		 if (textRegCapoluogo.getText() == null || textRegCapoluogo.getText().length() == 0)
+		 if (textRegCapoluogo.getText() == null || textRegCapoluogo.getText().length() == 0 || textRegCapoluogo.getText().matches(".*\\d+.*"))
 	            errorMessage += "Capoluogo non valido\n"; 
         if (spinRegSuperficie.getValue() == null || spinRegSuperficie.getValue() <= 0)
             errorMessage += "Superficie non valida!\n"; 

@@ -37,6 +37,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
@@ -105,6 +107,7 @@ public class AnalistaInterfaceController {
 	private final static Provincia tutteProvince = new Provincia("Tutte le province", 1, "Tutto", tutteRegioni);
 	private final static Comune tuttiComuni = new Comune("Tutti i comuni", 0, "000000", null, null, true, null);
 	private final static String tuttiDecessi = "TUTTI I DECESSI";
+	private final static String nessunDecesso = "NESSUNO DECESSO";
 	private final static String tuttiContagi = "TUTTI I CONTAGI";
 	private final static String pressoMedicoBase = "PRESSO MEDICO DI BASE";
 	private final static String ricoverati = "RICOVERATI IN TERAPIA INTENSIVA";
@@ -212,6 +215,7 @@ public class AnalistaInterfaceController {
     	//inizializzazione combobox delle cause di decesso
     	ObservableList<String> decessoValues = FXCollections.observableArrayList();
     	decessoValues.add(tuttiDecessi);
+    	decessoValues.add(nessunDecesso);
     	for(CausaDecesso d: CausaDecesso.values())
     		decessoValues.add(d.toString());
     	
@@ -249,6 +253,7 @@ public class AnalistaInterfaceController {
 				province.add(p);
 		}
 		comboProvinciaTabella.setItems(province);
+		comboProvinciaTabella.setValue(tutteProvince);
 	}
 	
 	@FXML
@@ -261,6 +266,7 @@ public class AnalistaInterfaceController {
 				comuni.add(c);
 		}
 		comboComuneTabella.setItems(comuni);
+		comboComuneTabella.setValue(tuttiComuni);
 	}
 
 	@FXML
@@ -292,6 +298,9 @@ public class AnalistaInterfaceController {
 		try {
 			annoSelezionato = Integer.parseInt(txtAnno.getText());
 		} catch (NumberFormatException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setHeaderText("Selezionare un anno valido!");
+			alert.showAndWait();
 			txtAnno.clear();
 			return;
 		}
@@ -303,6 +312,13 @@ public class AnalistaInterfaceController {
 		String malattiaSelezionata = comboContagiTabella.getValue();
 		String causaDecessoSelezionata = comboDecessiTabella.getValue();
 		String statoContagio = comboStatoContagio.getValue();
+		
+		if(malattiaSelezionata == null || causaDecessoSelezionata == null || statoContagio == null || regSelezionata == null) {
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setHeaderText("Le combobox devono essere riempite!");
+			alert.showAndWait();
+			return;
+		}
 		
 		ObservableList<DisplayData> datiTab = FXCollections.observableArrayList();
 		
@@ -394,13 +410,10 @@ public class AnalistaInterfaceController {
 	}
 	
 	private int yearCheck(Date dataSegnalazione, int annoSelezionato) throws IOException {
-	Calendar cal1 = Calendar.getInstance();
-	
-	cal1.setTime(dataSegnalazione);
-	
-	return cal1.get(Calendar.YEAR) - annoSelezionato;
-	
-}
+		Calendar cal1 = Calendar.getInstance();
+		cal1.setTime(dataSegnalazione);
+		return cal1.get(Calendar.YEAR) - annoSelezionato;
+	}
 	
 	
 	/**
@@ -499,59 +512,49 @@ public class AnalistaInterfaceController {
 						selectedRegione.add(r);
 					}
 				}
-				
-				charts();
 			}
 			else if ((!comboRegioneGrafico.getValue().equals(tutteRegioni)) && comboProvinciaGrafico.getValue() == null) {	//se selezionato regione specifica, ma non la provincia
-				if (selectedRegione.contains(comboRegioneGrafico.getValue())){
-				}
-				else {
+				if (!selectedRegione.contains(comboRegioneGrafico.getValue()))
 					selectedRegione.add(comboRegioneGrafico.getValue());
-					charts();
-				}
 			}
 			else {																	//se selezionata una regione
 				if(comboProvinciaGrafico.getValue().equals(tutteProvince)) {						//se selezionato tutteProvince
-					for(Provincia p : listaProvincia) {
-						if (p.getRegioneAppartenenza().equals(comboRegioneGrafico.getValue()) && !selectedProvincia.contains(p)){
+					for(Provincia p : listaProvincia) 
+						if (p.getRegioneAppartenenza().equals(comboRegioneGrafico.getValue()) && !selectedProvincia.contains(p))
 							selectedProvincia.add(p);
-						}
-					}
-					charts();
 				}
 				
-					
-				
 				else if ((!comboProvinciaGrafico.getValue().equals(tutteProvince)) && comboComuneGrafico.getValue() == null) {	//se selezionato provincia specifica, ma non il comune
-					if (!selectedProvincia.contains(comboProvinciaGrafico.getValue())){
-						selectedProvincia.add(comboProvinciaGrafico.getValue());
-						charts();
-					}
+					if (!selectedProvincia.contains(comboProvinciaGrafico.getValue()))
+						selectedProvincia.add(comboProvinciaGrafico.getValue());	
 				}
 				else {
 					if(comboComuneGrafico.getValue().equals(tuttiComuni)) { 			//tutte i comuni di una provincia
-						for(Comune c : listaComune) {
-							if (c.getProvinciaAppartenenza().equals(comboProvinciaGrafico.getValue())&& !selectedComune.contains(c)){
+						for(Comune c : listaComune)
+							if (c.getProvinciaAppartenenza().equals(comboProvinciaGrafico.getValue())&& !selectedComune.contains(c))
 								selectedComune.add(c);
-							}
-						}
-						charts();
+						
 						
 					}
 					else if (!comboComuneGrafico.getValue().equals(tuttiComuni)) {
-						if (!selectedComune.contains(comboComuneGrafico.getValue())){
+						if (!selectedComune.contains(comboComuneGrafico.getValue()))
 							selectedComune.add(comboComuneGrafico.getValue());
-							charts();
-						}
+
 					}
 				}
 			}
-					
+			charts();		
 			fillLista();	//serve per eliminare
 		}
 		else {
-			System.out.println("luogo Ã¨ empty");
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setHeaderText("Selezionare un luogo");
+			alert.showAndWait();
 		}
+		
+		comboRegioneGrafico.setValue(tutteRegioni);
+		comboProvinciaGrafico.setValue(null);
+		comboComuneGrafico.setValue(null);
 	}
 	
 	@FXML
@@ -602,12 +605,25 @@ public class AnalistaInterfaceController {
 			annoIniziale = Integer.parseInt(selectAnnoIniz.getText());
 		} catch (NumberFormatException e) {
 			selectAnnoIniz.clear();
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setHeaderText("Impostare un anno valido!");
+			alert.showAndWait();
 			return;
 		}
 		try {
 			annoFinale = Integer.parseInt(selectAnnoFinal.getText());
 		} catch (NumberFormatException e) {
 			selectAnnoFinal.clear();
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setHeaderText("Impostare un anno valido!");
+			alert.showAndWait();
+			return;
+		}
+		
+		if(annoIniziale > annoFinale) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setHeaderText("L'anno iniziale non può essere maggiore di quello finale!");
+			alert.showAndWait();
 			return;
 		}
 		
@@ -655,27 +671,32 @@ public class AnalistaInterfaceController {
 					
 					casiContagio.clear();
 					
-					serieDecessoline = new XYChart.Series<Long, Number>();
-					serieDecessoline.setName(r.getNome() + " Deceduti");
-					serieDecessobar = new XYChart.Series<String, Number>();
-					serieDecessobar.setName(r.getNome() + " Deceduti");
-					
-					for(SegnalazioneDecessi sd: listasegnalazioneDecessi) {
-						if(sd.getProvinciaRiferimento().getRegioneAppartenenza().equals(r) &&
-								yearCheck(sd.getData(), annoIniziale) >= 0 && yearCheck(sd.getData(), annoFinale) <= 0) {
-							
-							totDecessi += getDecessi(sd, causaDecessoSelezionata);
-							
-							casiDecesso = fillCasiDecesso(casiDecesso, sd, causaDecessoSelezionata);
+					if(!comboDecessiGrafico.getValue().equals(nessunDecesso)) {
+						serieDecessoline = new XYChart.Series<Long, Number>();
+						serieDecessoline.setName(r.getNome() + " Deceduti");
+						serieDecessobar = new XYChart.Series<String, Number>();
+						serieDecessobar.setName(r.getNome() + " Deceduti");
+						
+						
+						for(SegnalazioneDecessi sd: listasegnalazioneDecessi) {
+							if(sd.getProvinciaRiferimento().getRegioneAppartenenza().equals(r) &&
+									yearCheck(sd.getData(), annoIniziale) >= 0 && yearCheck(sd.getData(), annoFinale) <= 0) {
+								
+								totDecessi += getDecessi(sd, causaDecessoSelezionata);
+								
+								casiDecesso = fillCasiDecesso(casiDecesso, sd, causaDecessoSelezionata);
+							}
 						}
+						serieDecessobar.getData().add(new XYChart.Data<String, Number>(r.getNome(), totDecessi));
+						serieDecessoline = getDecessoLineChart(casiDecesso, serieDecessoline);
+						
+						casiDecesso.clear();
+						lineChart.getData().add(serieDecessoline);
+						barChart.getData().add(serieDecessobar);
 					}
-					serieDecessobar.getData().add(new XYChart.Data<String, Number>(r.getNome(), totDecessi));
-					serieDecessoline = getDecessoLineChart(casiDecesso, serieDecessoline);
 					
-					casiDecesso.clear();
-					
-					lineChart.getData().addAll(serieContagioline,serieDecessoline);		
-					barChart.getData().addAll(serieContagiobar,serieDecessobar);
+					lineChart.getData().add(serieContagioline);		
+					barChart.getData().add(serieContagiobar);
 				}
 			}
 			
@@ -701,34 +722,37 @@ public class AnalistaInterfaceController {
 						}
 					}
 					
-					serieContagiobar.getData().add(new XYChart.Data<String, Number>(p.getNome()+" prov", totContagi));
+					serieContagiobar.getData().add(new XYChart.Data<String, Number>(p.getNome()+" (Provincia)", totContagi));
 					serieContagioline = getContagioLineChart(casiContagio, serieContagioline);
 					
 					
 					
 					casiContagio.clear();
-					
-					serieDecessoline = new XYChart.Series<Long, Number>();
-					serieDecessoline.setName(p.getNome() + " (Provincia Deceduti)");
-					serieDecessobar = new XYChart.Series<String, Number>();
-					serieDecessobar.setName(p.getNome() + " (Provincia Deceduti)");
-					
-					for(SegnalazioneDecessi sd: listasegnalazioneDecessi) {
-						if(sd.getProvinciaRiferimento().equals(p) &&
-								yearCheck(sd.getData(), annoIniziale) >= 0 && yearCheck(sd.getData(), annoFinale) <= 0) {
-							
-							totDecessi += getDecessi(sd, causaDecessoSelezionata);
-							
-							casiDecesso = fillCasiDecesso(casiDecesso, sd, causaDecessoSelezionata);
+					if(!comboDecessiGrafico.getValue().equals(nessunDecesso)) {
+						serieDecessoline = new XYChart.Series<Long, Number>();
+						serieDecessoline.setName(p.getNome() + " (Provincia Deceduti)");
+						serieDecessobar = new XYChart.Series<String, Number>();
+						serieDecessobar.setName(p.getNome() + " (Provincia Deceduti)");
+						
+						for(SegnalazioneDecessi sd: listasegnalazioneDecessi) {
+							if(sd.getProvinciaRiferimento().equals(p) &&
+									yearCheck(sd.getData(), annoIniziale) >= 0 && yearCheck(sd.getData(), annoFinale) <= 0) {
+								
+								totDecessi += getDecessi(sd, causaDecessoSelezionata);
+								
+								casiDecesso = fillCasiDecesso(casiDecesso, sd, causaDecessoSelezionata);
+							}
 						}
+						serieDecessobar.getData().add(new XYChart.Data<String, Number>(p.getNome()+" (Provincia)", totDecessi));
+						serieDecessoline = getDecessoLineChart(casiDecesso, serieDecessoline);
+						
+						casiDecesso.clear();
+						lineChart.getData().add(serieDecessoline);
+						barChart.getData().add(serieDecessobar);
 					}
-					serieDecessobar.getData().add(new XYChart.Data<String, Number>(p.getNome()+" (Provincia)", totDecessi));
-					serieDecessoline = getDecessoLineChart(casiDecesso, serieDecessoline);
 					
-					casiDecesso.clear();
-					
-					lineChart.getData().addAll(serieContagioline,serieDecessoline);		
-					barChart.getData().addAll(serieContagiobar,serieDecessobar);
+					lineChart.getData().add(serieContagioline);		
+					barChart.getData().add(serieContagiobar);
 			
 				}
 			}
@@ -820,7 +844,7 @@ public class AnalistaInterfaceController {
 			casiDecesso.put(endYear(sd.getData()), newValue);
 		}
 		
-		if(casiDecesso.firstKey() != null) {
+		if(!casiDecesso.isEmpty()) {
 			if(casiDecesso.firstKey() < lowerBound)
 				lowerBound = casiDecesso.firstKey();
 			if(casiDecesso.lastKey() > upperBound)
@@ -862,12 +886,12 @@ public class AnalistaInterfaceController {
 		}
 		
 		if (contagi != 0) {
-			casiContagio.putIfAbsent(endYear(sc.getData()), contagi);
-		
 			if (casiContagio.containsKey(endYear(sc.getData()))) {
 				int newValue = casiContagio.get(endYear(sc.getData())) + contagi;
 				casiContagio.put(endYear(sc.getData()), newValue);
 			}
+			else
+			 casiContagio.put(endYear(sc.getData()), contagi);
 		}
 		
 		if(casiContagio.firstKey() < lowerBound)
@@ -897,6 +921,7 @@ public class AnalistaInterfaceController {
 	void fillLista() {
 		
 		ObservableList<String> lista = FXCollections.observableArrayList();
+		lista.clear();
 		
 		if(!selectedComune.isEmpty()) {
 			for(Comune i : selectedComune)
@@ -945,7 +970,7 @@ public class AnalistaInterfaceController {
 			}
 			else{
 				for(Provincia i : selectedProvincia) {
-					String provincia = i.getNome() + "prov";
+					String provincia = i.getNome() + " (Provincia)";
 					if (provincia.equals(comboLista.getValue())) {
 						deleteP = i;
 					}

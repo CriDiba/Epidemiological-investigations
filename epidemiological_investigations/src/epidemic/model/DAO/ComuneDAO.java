@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Properties;
 
 import epidemic.model.Comune;
+import epidemic.model.Contratto;
 import epidemic.model.Provincia;
 import epidemic.model.Territorio;
 import javafx.collections.FXCollections;
@@ -321,7 +322,14 @@ public class ComuneDAO implements DAO<Comune>{
 
 		Comune comune = new Comune(result.getString("nome"), result.getDouble("superficie"), result.getString("istat"),
 				result.getDate("data_istituzione"), Territorio.values()[result.getInt("territorio")], result.getBoolean("mare"), provincia);
+
+		try {
+			comune.setResponsabile((Contratto)database.getUtenteDAO().get(result.getInt("id_responsabile")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		comune.setId(result.getInt("id"));
+
 		
 		return comune;
 	}
