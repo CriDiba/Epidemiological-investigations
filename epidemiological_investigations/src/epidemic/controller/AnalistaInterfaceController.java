@@ -25,7 +25,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.chart.Axis;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -44,6 +43,16 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 
+/**
+ * Interfaccia del sistema per utenti con ruolo di Ricercatore Analista
+ * Tramite questa interfaccia è possibile analizzare anno per anno i dati acquisiti 
+ * e ottenere rappresentazioni tabulari e grafiche.
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class AnalistaInterfaceController {
     
 	
@@ -108,7 +117,7 @@ public class AnalistaInterfaceController {
 	private final static Provincia tutteProvince = new Provincia("Tutte le province", 1, "Tutto", tutteRegioni);
 	private final static Comune tuttiComuni = new Comune("Tutti i comuni", 0, "000000", null, null, true, null);
 	private final static String tuttiDecessi = "TUTTI I DECESSI";
-	private final static String nessunDecesso = "NESSUNO DECESSO";
+	private final static String nessunDecesso = "NESSUN DECESSO";
 	private final static String tuttiContagi = "TUTTI I CONTAGI";
 	private final static String pressoMedicoBase = "PRESSO MEDICO DI BASE";
 	private final static String ricoverati = "RICOVERATI IN TERAPIA INTENSIVA";
@@ -156,6 +165,8 @@ public class AnalistaInterfaceController {
 		initTableCols();
 		
 		xLineChart.setTickLabelFormatter(stringConverter);
+		
+		barChart.setTitle("Totale del periodo selezionato");
 		
 		database = new MySqlDAOFactory();
     	
@@ -299,9 +310,7 @@ public class AnalistaInterfaceController {
 		try {
 			annoSelezionato = Integer.parseInt(txtAnno.getText());
 		} catch (NumberFormatException e) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setHeaderText("Selezionare un anno valido!");
-			alert.showAndWait();
+			noSelectionWarning("Selezionare un anno valido!");
 			txtAnno.clear();
 			return;
 		}
@@ -315,9 +324,7 @@ public class AnalistaInterfaceController {
 		String statoContagio = comboStatoContagio.getValue();
 		
 		if(malattiaSelezionata == null || causaDecessoSelezionata == null || statoContagio == null || regSelezionata == null) {
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setHeaderText("Le combobox devono essere riempite!");
-			alert.showAndWait();
+			noSelectionWarning("Le combobox devono essere riempite!");
 			return;
 		}
 		
@@ -490,7 +497,7 @@ public class AnalistaInterfaceController {
 	}
 	
 	/**
-	 * @return se il campo luogo Ã¨ stato compilato in modo corretto
+	 * @return se il campo luogo è stato compilato in modo corretto
 	 */
 	private boolean luogoIsValid() {
 		if (comboRegioneGrafico.getValue() != null){		
@@ -502,7 +509,9 @@ public class AnalistaInterfaceController {
 	}
 		
 		
-	
+	/**
+	 * riempie lista con i luoghi selezionati
+	 */
 	@FXML
 	public void fillGraph(ActionEvent event) throws IOException {
 		
@@ -548,9 +557,7 @@ public class AnalistaInterfaceController {
 			fillLista();	//serve per eliminare
 		}
 		else {
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setHeaderText("Selezionare un luogo");
-			alert.showAndWait();
+			noSelectionWarning("Selezionare un luogo");
 		}
 		
 		comboRegioneGrafico.setValue(tutteRegioni);
@@ -558,6 +565,11 @@ public class AnalistaInterfaceController {
 		comboComuneGrafico.setValue(null);
 	}
 	
+	
+	/**
+	 * resetta bound asse x del linechart 
+	 * chiama chart()
+	 */
 	@FXML
     public void updateGraph(ActionEvent event) throws IOException {
 		lowerBound = Long.MAX_VALUE;
@@ -565,9 +577,12 @@ public class AnalistaInterfaceController {
 		charts(); 
 	}
 	
+	
 	/**
+	 * ultimo giorno dell'anno in millisecondi
+	 * 
 	 * @param data selezionata
-	 * @return stringa contenente l'anno della data
+	 * @return long contenente l 'ultimo giorno dell'anno in millisecondi
 	 */
 	private Long endYear(Date selectedDate) {
 		Calendar calendar = Calendar.getInstance();
@@ -577,6 +592,13 @@ public class AnalistaInterfaceController {
 		return calendar.getTimeInMillis();
 	}
 
+	/**
+	 * cambia data in long
+	 * 
+	 * @param integer anno
+	 * @param boolean upperbound
+	 * @return long time in millisecondi
+	 */
     private Long getMillisFromYear(Integer year, boolean upperBound) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, year);
@@ -590,6 +612,8 @@ public class AnalistaInterfaceController {
 		}
 		return calendar.getTimeInMillis();
     }
+    
+    
 	/**
 	 * cicla su tutti i luoghi e completa il linechat e il barchart con i dati di contagio e decesso selezionati
 	 * linechart con visione annuale o in base a quando inserito
@@ -606,25 +630,22 @@ public class AnalistaInterfaceController {
 			annoIniziale = Integer.parseInt(selectAnnoIniz.getText());
 		} catch (NumberFormatException e) {
 			selectAnnoIniz.clear();
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setHeaderText("Impostare un anno valido!");
-			alert.showAndWait();
+			noSelectionWarning("Impostare un anno valido!");
+			delete();
 			return;
 		}
 		try {
 			annoFinale = Integer.parseInt(selectAnnoFinal.getText());
 		} catch (NumberFormatException e) {
 			selectAnnoFinal.clear();
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setHeaderText("Impostare un anno valido!");
-			alert.showAndWait();
+			noSelectionWarning("Impostare un anno valido!");
+			delete();
 			return;
 		}
 		
 		if(annoIniziale > annoFinale) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setHeaderText("L'anno iniziale non può essere maggiore di quello finale!");
-			alert.showAndWait();
+			noSelectionWarning("L'anno iniziale non può essere maggiore di quello finale!");
+			delete();
 			return;
 		}
 		
@@ -640,6 +661,12 @@ public class AnalistaInterfaceController {
 		String malattiaSelezionata = comboContagiGrafico.getValue();
 		String causaDecessoSelezionata = comboDecessiGrafico.getValue();
 		String statoContagio = comboStatoContagioGrafico.getValue();
+		
+		if (malattiaSelezionata == null || causaDecessoSelezionata == null || statoContagio == null) {
+			noSelectionWarning("Selezionare un tipo di malattia ed una causa di decesso");
+			delete();
+			return;
+		}
 		
 		TreeMap <Long, Integer> casiContagio = new TreeMap<Long,Integer>();
 		TreeMap <Long, Integer> casiDecesso = new TreeMap<Long,Integer>();
@@ -855,6 +882,12 @@ public class AnalistaInterfaceController {
 		return casiDecesso;
 	}
 	
+    /**
+	 * cambia data in long
+	 * 
+	 * @param data
+	 * @return long time in millisecondi
+	 */
 	private long dateToLong(Date date) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
@@ -906,11 +939,13 @@ public class AnalistaInterfaceController {
 	 * elimina tutti i comuni/province/regioni selezionati
 	 */
 	@FXML
-	void delete(ActionEvent event) {
+	void delete() {
 		
 		selectedComune.clear();
 		selectedProvincia.clear();
 		selectedRegione.clear();
+		
+		comboLista.getItems().clear();
 		 
 		lineChart.getData().clear();
 		barChart.getData().clear();
@@ -1000,7 +1035,23 @@ public class AnalistaInterfaceController {
 	}
 	
 	
-	class DisplayData {
+	/**
+	 * Genera un alert di waring con un messaggio a video
+	 * @param messaggio da mostrare nell'alert
+	 */
+	private void noSelectionWarning(String messaggio) {
+        Alert alert = new Alert(AlertType.WARNING);
+        alert.setTitle("Nessuna Selezione");
+        alert.setHeaderText(messaggio);
+        alert.showAndWait();
+	}
+	
+	
+	/**
+	 * Classe interna che rappresenta un oggetto di una TableView
+	 *
+	 */
+	public class DisplayData {
 		int anno, numContagi, numDecessi;
 		private Localita localita;
 		private String tipoContagio, tipoDecesso;

@@ -26,6 +26,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 
+/**
+ * Interfaccia del sistema per utenti con ruolo di Amministratore
+ * Tramite questa interfaccia è possibile creare gli utenti del 
+ * sistema ed assgnare loro un ruolo
+ * 
+ * @author Cristiano Di Bari
+ * @author Matteo Cavaliere
+ * @author Enrico Lonardi
+ *
+ */
 public class AdminInterfaceController implements Initializable {
     @FXML
     private TableView<Utente> tableView;
